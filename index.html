@@ -1,1 +1,323 @@
-<h1>Hello, World</h1>
+<html>
+<head>
+	<title>Symantic Quran</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
+
+	<style type="text/css">
+		.clear {
+			clear: both;
+		}
+		.header {
+			width: 100%;
+			padding-bottom: 10px;
+			background-color: #B0BB52;
+			border: 1px solid black;
+			text-shadow: none;
+		}
+		.header h1 {
+			font-size: 40px;
+			padding: 5px 0 0 20px;
+			margin: 0;
+		}
+		.header h2 {
+			font-size: 20px;
+			padding: 0 0 0 20px;
+			margin: 0;
+		}
+		#contentBody {
+			/*background-color: #DADADA;*/
+			text-shadow: none;
+		}
+		#contentArea {
+			width: 80%;
+			margin: 0 auto;
+		}
+		#contentArea > .ui-block-a {
+			width: 15%;
+			min-width: 150px;
+		}
+		#contentArea > .ui-block-b {
+			width: 85%;
+		}
+		.sidePanel {
+			background-color: #B0BB52;
+			height: 100%;
+			width: 200px;
+			float: left;
+			border: 1px solid black;
+			border-top-width: 0;
+			padding-bottom: 10px;
+		}
+		.sidePanel h3 {
+			margin: 15px 0 10px 0;
+		}
+		.sidePanel #searchArea {
+			padding: 10px;
+		}
+		.sidePanel button {
+			margin: 5px 0px;
+			padding: 5px 8px;
+		}
+		.tagGroupHeader {
+			padding-left: 10px;
+		}
+		.resultsPane {
+		}
+		.resultsPane .ui-block-a {
+			width: 88%;
+		}
+		.resultsPane .ui-block-b {
+			width: 12%;
+		}
+		.result .ayahWrapper {
+			background-color: beige;
+			border: 1px solid black;
+			border-left-width: 0;
+			border-top-width: 0;
+			text-align: right;
+			padding: 10px;
+		}
+		.result .ayah {
+			font-size: 25px;
+		}
+		.result .ayahRef {
+			font-size: 25px; 
+			padding-left: 10px;
+		}
+		.result .translation {
+			font-size: 15px;
+			padding-top: 5px;
+		}
+		ul{
+			padding: 0;
+			margin: 0;
+		}
+		li.tag {
+			display: inline-block;
+			list-style-type: none;
+			border: 1px solid gray;
+			border-radius: 10px;
+			background-color: beige;
+			cursor: pointer;
+			padding: 5px;
+			margin: 1px;
+			font-size: 10px;
+		}
+		li.addTag {
+			background-color: lightgreen;
+		}
+		.resultsPane ul {
+			margin-top: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="header">
+		<h1>Semantic Quran</h1>
+		<h2>Search the Quran based on tags and semantic themes</h2>
+	</div>
+	<div id="contentBody">
+		<div id="contentArea" class="ui-grid-a">
+			<div class="sidePanel ui-block-a">
+				<div id="searchArea">
+					<h3>Search Tags</h3>
+					<label for="search-1">Search for a topic in the Quran. Results are crowd sourced and are constantly being improved.</label>
+			     	<input type="search" name="search-tag" id="search-tag" value="Parenthood">
+			     	<button id="searchButton" type="button">Search</button>
+				</div>
+				<div id="suggestedTags" class="tagGroupHeader">
+					<h3>Suggested Tags</h3>
+					<ul>
+						<li class="tag">Marriage</li>
+						<li class="tag">Parenthood</li>
+						<li class="tag">Prayer</li>
+						<li class="tag">Fasting</li>
+						<li class="tag">Hajj</li>
+					</ul>
+				</div>
+				<div id="mostUsedTags" class="tagGroupHeader">
+					<h3>Most Used Tags</h3>
+					<ul>
+						<li class="tag">Marriage</li>
+						<li class="tag">Parenthood</li>
+						<li class="tag">Prayer</li>
+						<li class="tag">Fasting</li>
+						<li class="tag">Hajj</li>
+					</ul>
+				</div>
+				<div id="lastUsedTags" class="tagGroupHeader">
+					<h3>Last Used Tags</h3>
+					<ul>
+						<li class="tag">Marriage</li>
+						<li class="tag">Parenthood</li>
+						<li class="tag">Prayer</li>
+						<li class="tag">Fasting</li>
+						<li class="tag">Hajj</li>
+					</ul>
+				</div>
+			</div>
+			<div class="resultsPane ui-block-b">
+				<div class="result ui-grid-a">
+					<div class="ayahWrapper ui-block-a">
+						<div class="ayah">*Ayah Text*</div>
+						<div class="translation">*Translation Text*</div>
+					</div>
+					<div class="ayahRef ui-block-b">[10:100]</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- This is for JQuery Mobile dialog prompt. Doesnt look even close to right for me though. Not sure why. Not using it for now. -->
+	<a id="dialogLink" href="#addTagDialog" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop" style="display: none">Add a Tag</a>
+	<div data-role="popup" id="addTagDialog" class="ui-corner-all">
+	    <form>
+	        <div style="padding:10px 20px;">
+	            <h3>Add a Tag</h3>
+	            <input type="text" name="tagName" id="un" value="" placeholder="tagName">
+	            <button type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
+	        </div>
+	    </form>
+	</div>
+	<!-- ------------------------------------------------------------------------ -->
+
+	<script type="text/javascript">
+	function doAddTag(val, surahNum, verseNum) {
+		console.log("Adding tag: " + val + " to " + "[" + surahNum + ":" + verseNum + "]")
+	}
+
+	function doSeatch(val) {
+		console.log("Doing search for: " + val);
+		var resultPane = $('.resultsPane').empty();
+
+		var data = [
+		{
+			surah: -1,
+			verse: -1,
+			arabic: val,
+			english: val,
+			tags: [
+				val,
+				"tag1",
+				"tag2",
+				"tag3"
+			]
+		},
+		{
+			surah: -2,
+			verse: -2,
+			arabic: "Bismillah",
+			english: "In the name of Allah",
+			tags: [
+				val,
+			]
+		},
+		{
+			surah: -3,
+			verse: -3,
+			arabic: "Allahu Akbar",
+			english: "Allah is the greatest",
+			tags: [
+				val,
+				"tag1",
+			]
+		},
+		{
+			surah: -4,
+			verse: -4,
+			arabic: "Subhanallah",
+			english: "Glory be to Allah",
+			tags: [
+			]
+		},
+		];
+
+		loadResults(data);
+
+		// Add the search to our recent searches
+		if(typeof(Storage) !== "undefined") {
+			if (!localStorage.tagMRU) {
+				localStorage.tagMRU = [];
+			}
+
+			localStorage.tagMRU.push(row)
+		}
+	}
+
+	function loadResults(data) {
+		$.each(data, function(i, row) {
+			var resultPane = $('.resultsPane');
+			var result = $('<div class="result ui-grid-a" style="display: hidden">')
+				.appendTo(resultPane)
+				.show(1000);;
+			var wrapper = $('<div class="ayahWrapper ui-block-a">')
+				.appendTo(result);
+			var ayah = $('<div class="ayah"></div>')
+				.text(row.arabic)
+				.appendTo(wrapper);
+			var translation = $('<div class="translation"></div>')
+				.text(row.english)
+				.appendTo(wrapper);
+			var tagGroup = $('<ul></ul>')
+				.appendTo(wrapper);
+			var ayahRef = $('<div class="ayahRef ui-block-b""></div>')
+				.text('[' + row.surah + ':' + row.verse + ']')
+				.appendTo(result);
+
+			// Add all the tags to the row
+			$.each(row.tags, function (j, tag) {
+				$("<li class='tag'></li>")
+					.text(tag)
+					.appendTo(tagGroup);
+			});
+
+			var addButton = $('<li class="addTag tag">')
+				.text("+")
+				.attr("surahNum", row.surah)
+				.attr("verseNum", row.verse)
+				.appendTo(tagGroup);
+		});
+	}
+
+	$(function () {
+		$("#contentBody").on("click", ".tag", function() {
+			var $this = $(this);
+
+			if (!$this.hasClass("addTag")) {
+				var val = $(this).text();
+				doSeatch(val);
+			}
+		});
+		$("#contentBody").on("click", ".addTag", function() {
+			var $this = $(this);
+
+			//var dialog = $("#dialogLink").click(); // The JQuery Mobile dialog box doesnt seem to work well.
+
+			var tag = prompt("What tag should be added?");
+			if (tag != null) {
+				// Send the new tag to the server
+				var surahNum = $this.attr("surahNum");
+				var verseNum = $this.attr("verseNum");
+				doAddTag(tag, surahNum, verseNum);
+
+				// Update the local row
+				var tagGroup = $this.parent();
+				$("<li class='tag'></li>")
+					.text(tag)
+					.prependTo(tagGroup);
+
+			}
+			
+		});
+		$("#searchButton").click(function() {
+			var val = $("#search-tag").val();
+			doSeatch(val);
+		});
+	});
+	</script>
+</body>
+</html>
