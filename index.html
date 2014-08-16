@@ -156,21 +156,16 @@
 				<div id="suggestedTags" class="tagGroupHeader">
 					<h3>Suggested Tags</h3>
 					<ul>
-						<li class="tag">Marriage</li>
-						<li class="tag">Parenthood</li>
-						<li class="tag">Prayer</li>
-						<li class="tag">Fasting</li>
-						<li class="tag">Hajj</li>
+						<li class="tag"><span class="tagName">Marriage</span></li>
+						<li class="tag"><span class="tagName">Parenthood</span></li>
+						<li class="tag"><span class="tagName">Prayer</span></li>
+						<li class="tag"><span class="tagName">Fasting</span></li>
+						<li class="tag"><span class="tagName">Hajj</span></li>
 					</ul>
 				</div>
 				<div id="lastUsedTags" class="tagGroupHeader">
 					<h3>Last Used Tags</h3>
 					<ul>
-						<li class="tag">Marriage</li>
-						<li class="tag">Parenthood</li>
-						<li class="tag">Prayer</li>
-						<li class="tag">Fasting</li>
-						<li class="tag">Hajj</li>
 					</ul>
 				</div>
 			</div>
@@ -384,7 +379,8 @@
 
 			//var dialog = $("#dialogLink").click(); // The JQuery Mobile dialog box doesnt seem to work well.
 
-			var tag = prompt("What tag should be added?");
+			var tag = prompt("What tag should be added? Spaces will be replaced by dashes.");
+			tag = tag.trim().replace(/\s/g, "-");
 			if (tag != null) {
 				// Send the new tag to the server
 				var surahNum = $this.attr("surahNum");
