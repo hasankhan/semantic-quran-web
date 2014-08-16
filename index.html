@@ -89,6 +89,7 @@
 		.result .ayahRef {
 			font-size: 25px; 
 			padding-left: 10px;
+			float: left;
 		}
 		.result .translation {
 			font-size: 15px;
@@ -297,11 +298,14 @@
 	function loadResults(data) {
 		$.each(data, function(i, row) {
 			var resultPane = $('.resultsPane');
-			var result = $('<div class="result ui-grid-a" style="display: hidden">')
+			var result = $('<div class="result" style="display: hidden">')
 				.appendTo(resultPane)
-				.show(1000);;
-			var wrapper = $('<div class="ayahWrapper ui-block-a">')
+				.show(1000);
+			var wrapper = $('<div class="ayahWrapper">')
 				.appendTo(result);
+			var ayahRef = $('<div class="ayahRef"></div>')
+				.text('[' + row.surah + ':' + row.verse + ']')
+				.appendTo(wrapper);
 			var ayah = $('<div class="ayah"></div>')
 				.text(row.quran.text)
 				.appendTo(wrapper);
@@ -310,9 +314,6 @@
 				.appendTo(wrapper);
 			var tagGroup = $('<ul></ul>')
 				.appendTo(wrapper);
-			var ayahRef = $('<div class="ayahRef ui-block-b""></div>')
-				.text('[' + row.surah + ':' + row.verse + ']')
-				.appendTo(result);
 
 			var audioPlayer = $(
 				'<audio controls preload="metadata">' +
