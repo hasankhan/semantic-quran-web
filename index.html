@@ -135,16 +135,16 @@
 					<h3>Browse Ayat</h3>
 			     	<!--<label for="surahSelect" class="select">Surah</label>-->
 					<select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
-					Â Â Â Â <option value="1">Al-Fatihah</option>
+						<option value="1">Al-Fatihah</option>
 					</select>
-			     	<!--<label for="ayahStartSelect" class="select">Start</label>
+			     	<label for="ayahStartSelect" class="select">Start</label>
 					<select name="ayahStartSelect" id="ayahStartSelect" data-mini="true" data-inline="true">
-					Â Â Â Â <option value="1">1</option>
+						<option value="1">1</option>
 					</select>
 			     	<label for="ayahEndSelect" class="select">End</label>
 					<select name="ayahEndSelect" id="ayahEndSelect" data-mini="true" data-inline="true">
-					Â Â Â Â <option value="7">7</option>
-					</select>-->
+						<option value="7">7</option>
+					</select>
 			     	<button id="viewButton" type="button">View</button>
 				</div>
 				<div id="searchArea">
@@ -184,14 +184,14 @@
 	<!-- Github ribbon -->
 	<a href="https://github.com/hasankhan/semantic-quran-web"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
 
-	<!-- This is for JQuery Mobile dialog prompt. Doesnt look even close to right for me though. Not sure why. Not using it for now. -->
+	<!-- This is for JQuery Mobile dialog prompt.  -->
 	<a id="dialogLink" href="#addTagDialog" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop" style="display: none">Add a Tag</a>
 	<div data-role="popup" id="addTagDialog" class="ui-corner-all">
 	    <form>
 	        <div style="padding:10px 20px;">
-	            <h3>Add a Tag</h3>
-	            <input type="text" name="tagName" id="un" value="" placeholder="tagName">
-	            <button type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
+	            <h3>Add a Tag. Spaces and other characters will be replaced with dashes.</h3>
+	            <input type="text" name="tagName" value="" id="addTagDialogTextBox" placeholder="(ex: Mercy-of-Allah)">
+	            <button id="addTagDialogButton" type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
 	        </div>
 	    </form>
 	</div>
@@ -201,9 +201,11 @@
 	var tagsMRU = [];
 	
 	function doAddTag(val, surahNum, verseNum) {
+		var deferred = $.Deferred();
+		
 		console.log("Adding tag: " + val + " to " + "[" + surahNum + ":" + verseNum + "]");
 		
-		$.ajax({          
+		var promise = $.ajax({          
             type:  'POST',
             url:   "http://semantic-quran.azure-mobile.net/api/tag",
             dataType: 'json',
@@ -211,11 +213,10 @@
 				tag: val,
 				surah: surahNum,
 				verse: verseNum
-			},     
-            success: function() {
-				console.log("Successfully Added")
-            }
+			}
          });
+		 
+		 return promise;
 	}
 	
 	function doDeleteTag(val, surahNum, verseNum) {
@@ -374,30 +375,38 @@
 			return false;
 		});
 		
+		$("#addTagDialogButton").click(function () {
+			var val = $("#addTagDialogTextBox").val();
+			alert("Need to add: " + val);
+			return false;
+		});
+		
 		$("#contentBody").on("click", ".addTag", function() {
 			var $this = $(this);
 
-			//var dialog = $("#dialogLink").click(); // The JQuery Mobile dialog box doesnt seem to work well.
-
+			var dialog = $("#dialogLink").click(); // The JQuery Mobile dialog box doesnt seem to work well.
 			var tag = prompt("What tag should be added? Spaces will be replaced by dashes.");
-			tag = tag.trim().replace(/\s/g, "-");
-			if (tag != null) {
+			
+			if (tag != null && tag.length>0) {
 				// Send the new tag to the server
 				var surahNum = $this.attr("surahNum");
 				var verseNum = $this.attr("verseNum");
-				doAddTag(tag, surahNum, verseNum);
-
-				// Update the local row
-				var tagGroup = $this.parent();					
-				var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
-				tagElement.append('<span class="tagName">' + tag + '</span>');
 				
-				var deleteElement = $('<span class="delete">x</span>')
-					.attr("tag", tag)
-					.attr("surah", surahNum)
-					.attr("verse", verseNum);
+				doAddTag(tag, surahNum, verseNum).done(function (val) {
+					console.log("Successfully Added: " + val);
 					
-				tagElement.append(deleteElement);
+					// Update the local row
+					var tagGroup = $this.parent();					
+					var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
+					tagElement.append('<span class="tagName">' + val + '</span>');
+					
+					var deleteElement = $('<span class="delete">x</span>')
+						.attr("tag", val)
+						.attr("surah", surahNum)
+						.attr("verse", verseNum);
+						
+					tagElement.append(deleteElement);
+				});
 			}
 		});
 		$("#searchButton").click(function() {
