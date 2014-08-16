@@ -1,4 +1,5 @@
 
+
 <html>
 <head>
 	<title>Symantic Quran</title>
@@ -137,14 +138,14 @@
 					<select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
 						<option value="1">Al-Fatihah</option>
 					</select>
-			     	<label for="ayahStartSelect" class="select">Start</label>
+			     	<!--<label for="ayahStartSelect" class="select">Start</label>
 					<select name="ayahStartSelect" id="ayahStartSelect" data-mini="true" data-inline="true">
 						<option value="1">1</option>
 					</select>
 			     	<label for="ayahEndSelect" class="select">End</label>
 					<select name="ayahEndSelect" id="ayahEndSelect" data-mini="true" data-inline="true">
 						<option value="7">7</option>
-					</select>
+					</select>-->
 			     	<button id="viewButton" type="button">View</button>
 				</div>
 				<div id="searchArea">
@@ -187,18 +188,17 @@
 	<!-- This is for JQuery Mobile dialog prompt.  -->
 	<a id="dialogLink" href="#addTagDialog" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop" style="display: none">Add a Tag</a>
 	<div data-role="popup" id="addTagDialog" class="ui-corner-all">
-	    <form>
-	        <div style="padding:10px 20px;">
-	            <h3>Add a Tag. Spaces and other characters will be replaced with dashes.</h3>
-	            <input type="text" name="tagName" value="" id="addTagDialogTextBox" placeholder="(ex: Mercy-of-Allah)">
-	            <button id="addTagDialogButton" type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
-	        </div>
-	    </form>
+        <div style="padding:10px 20px;">
+            <h3>Add a Tag. Spaces and other characters will be replaced with dashes.</h3>
+            <input type="text" name="tagName" value="" id="addTagDialogTextBox" placeholder="(ex: Mercy-of-Allah)">
+            <button id="addTagDialogButton" type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
+        </div>
 	</div>
 	<!-- ------------------------------------------------------------------------ -->
 
 	<script type="text/javascript">
 	var tagsMRU = [];
+	var context = null;
 	
 	function doAddTag(val, surahNum, verseNum) {
 		var deferred = $.Deferred();
@@ -333,6 +333,8 @@
 				.attr("verseNum", row.verse)
 				.appendTo(tagGroup);
 		});
+		
+		window.scroll(0, 0);
 	}
 	
 	(function initializeSurahDropdowns() {
@@ -376,15 +378,38 @@
 		});
 		
 		$("#addTagDialogButton").click(function () {
-			var val = $("#addTagDialogTextBox").val();
-			alert("Need to add: " + val);
+			var tag = $("#addTagDialogTextBox").val();
+			var surahNum = context.attr("surahNum");
+			var verseNum = context.attr("verseNum");
+			
+			if (tag != null && tag.length>0) {
+				// Send the new tag to the server				
+				doAddTag(tag, surahNum, verseNum).done(function (val) {
+					console.log("Successfully Added: " + val.text);
+					
+					// Update the local row
+					var tagGroup = context.parent();					
+					var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
+					tagElement.append('<span class="tagName">' + val.text + '</span>');
+					
+					var deleteElement = $('<span class="delete">x</span>')
+						.attr("tag", val.text)
+						.attr("surah", surahNum)
+						.attr("verse", verseNum);
+						
+					tagElement.append(deleteElement);
+				});
+			}
+			
+			$("#addTagDialog").popup("close");
 			return false;
 		});
 		
 		$("#contentBody").on("click", ".addTag", function() {
-			var $this = $(this);
-
+			context = $(this);
 			var dialog = $("#dialogLink").click(); // The JQuery Mobile dialog box doesnt seem to work well.
+			
+			/*
 			var tag = prompt("What tag should be added? Spaces will be replaced by dashes.");
 			
 			if (tag != null && tag.length>0) {
@@ -407,7 +432,7 @@
 						
 					tagElement.append(deleteElement);
 				});
-			}
+			}*/
 		});
 		$("#searchButton").click(function() {
 			var val = $("#search-tag").val();
