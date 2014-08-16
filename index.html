@@ -185,6 +185,9 @@
 			</div>
 		</div>
 	</div>
+	
+	<!-- Github ribbon -->
+	<a href="https://github.com/hasankhan/semantic-quran-web"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
 
 	<!-- This is for JQuery Mobile dialog prompt. Doesnt look even close to right for me though. Not sure why. Not using it for now. -->
 	<a id="dialogLink" href="#addTagDialog" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop" style="display: none">Add a Tag</a>
@@ -317,9 +320,15 @@
 
 			// Add all the tags to the row
 			$.each(row.tags, function (j, tag) {
-				var tagElement = $("<li class='tag'></li>").appendTo(tagGroup);
+				var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
 				tagElement.append('<span class="tagName">' + tag + '</span>');
-				tagElement.append('<span class="delete">x</span>');
+				
+				var deleteElement = $('<span class="delete">x</span>')
+					.attr("tag", tag)
+					.attr("surah", row.surah)
+					.attr("verse", row.verse);
+					
+				tagElement.append(deleteElement);
 			});
 			
 			var addButton = $('<li class="addTag tag">')
@@ -361,10 +370,10 @@
 		
 		$("#contentBody").on("click", "span.delete", function() {
 			var $this = $(this);
-			var tag = $(this).attr("tag");
-			var surah = $(this).attr("surah");
-			var verse = $(this).attr("verse");
-			
+			var tag = $this.attr("tag");
+			var surah = $this.attr("surah");
+			var verse = $this.attr("verse");
+			var parent = $this.parent().remove(); 
 			doDeleteTag(tag, surah, verse);
 			
 			return false;
@@ -383,12 +392,17 @@
 				doAddTag(tag, surahNum, verseNum);
 
 				// Update the local row
-				var tagGroup = $this.parent();
-				$("<li class='tag'></li>")
-					.text(tag)
-					.prependTo(tagGroup);
+				var tagGroup = $this.parent();					
+				var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
+				tagElement.append('<span class="tagName">' + tag + '</span>');
+				
+				var deleteElement = $('<span class="delete">x</span>')
+					.attr("tag", tag)
+					.attr("surah", surahNum)
+					.attr("verse", verseNum);
+					
+				tagElement.append(deleteElement);
 			}
-			
 		});
 		$("#searchButton").click(function() {
 			var val = $("#search-tag").val();
