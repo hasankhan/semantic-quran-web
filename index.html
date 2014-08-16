@@ -1,3 +1,4 @@
+
 <html>
 <head>
 	<title>Symantic Quran</title>
@@ -82,7 +83,7 @@
 			padding: 10px;
 		}
 		.result .ayah {
-			font-size: 25px;
+			font-size: 35px;
 		}
 		.result .ayahRef {
 			font-size: 25px; 
@@ -110,37 +111,50 @@
 		li.addTag {
 			background-color: lightgreen;
 		}
+		span.delete {
+			padding-left: 5px;
+			color: red;
+		}
 		.resultsPane ul {
 			margin-top: 10px;
+		}
+		audio {
+			padding-top: 5px;
 		}
 	</style>
 </head>
 <body>
 	<div class="header">
 		<h1>Semantic Quran</h1>
-		<h2>Search the Quran based on tags and semantic themes</h2>
+		<h2>Browse and search the Quran based on tags and semantic themes</h2>
 	</div>
 	<div id="contentBody">
 		<div id="contentArea" class="ui-grid-a">
 			<div class="sidePanel ui-block-a">
+				<div id="browseArea">
+					<h3>Browse Ayat</h3>
+			     	<!--<label for="surahSelect" class="select">Surah</label>-->
+					<select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
+					Â Â Â Â <option value="1">Al-Fatihah</option>
+					</select>
+			     	<!--<label for="ayahStartSelect" class="select">Start</label>
+					<select name="ayahStartSelect" id="ayahStartSelect" data-mini="true" data-inline="true">
+					Â Â Â Â <option value="1">1</option>
+					</select>
+			     	<label for="ayahEndSelect" class="select">End</label>
+					<select name="ayahEndSelect" id="ayahEndSelect" data-mini="true" data-inline="true">
+					Â Â Â Â <option value="7">7</option>
+					</select>-->
+			     	<button id="viewButton" type="button">View</button>
+				</div>
 				<div id="searchArea">
 					<h3>Search Tags</h3>
 					<label for="search-1">Search for a topic in the Quran. Results are crowd sourced and are constantly being improved.</label>
-			     	<input type="search" name="search-tag" id="search-tag" value="Parenthood">
+			     	<input type="search" name="search-tag" id="search-tag" value="praise-of-Allah">
 			     	<button id="searchButton" type="button">Search</button>
 				</div>
 				<div id="suggestedTags" class="tagGroupHeader">
 					<h3>Suggested Tags</h3>
-					<ul>
-						<li class="tag">Marriage</li>
-						<li class="tag">Parenthood</li>
-						<li class="tag">Prayer</li>
-						<li class="tag">Fasting</li>
-						<li class="tag">Hajj</li>
-					</ul>
-				</div>
-				<div id="mostUsedTags" class="tagGroupHeader">
-					<h3>Most Used Tags</h3>
 					<ul>
 						<li class="tag">Marriage</li>
 						<li class="tag">Parenthood</li>
@@ -186,17 +200,58 @@
 	<!-- ------------------------------------------------------------------------ -->
 
 	<script type="text/javascript">
+	var tagsMRU = [];
+	
 	function doAddTag(val, surahNum, verseNum) {
-		console.log("Adding tag: " + val + " to " + "[" + surahNum + ":" + verseNum + "]")
+		console.log("Adding tag: " + val + " to " + "[" + surahNum + ":" + verseNum + "]");
+		
+		$.ajax({          
+            type:  'POST',
+            url:   "http://semantic-quran.azure-mobile.net/api/tag",
+            dataType: 'json',
+			data: {
+				tag: val,
+				surah: surahNum,
+				verse: verseNum
+			},     
+            success: function() {
+				console.log("Successfully Added")
+            }
+         });
+	}
+	
+	function doDeleteTag(val, surahNum, verseNum) {
+		console.log("Deleting tag: " + val + " to " + "[" + surahNum + ":" + verseNum + "]");
+		
+		$.ajax({          
+            type:  'DELETE',
+            url:   "http://semantic-quran.azure-mobile.net/api/tag/" + val + "/" + surahNum + "/" + verseNum,
+            dataType: 'json',
+            success: function() {
+				console.log("Successfully Deleted")
+            }
+         });
+	}
+	
+	function updateMRU() {
+		var container = $('#lastUsedTags ul').empty();
+		$.each(tagsMRU, function(i, tag) {
+			var tagElement = $("<li class='tag'></li>").appendTo(container);
+			tagElement.append('<span class="tagName">' + tag + '</span>');
+		});
+		
+		if(typeof(Storage) !== "undefined") {
+			localStorage.tagsMRU = JSON.stringify(tagsMRU);
+		}
 	}
 
-	function doSeatch(val) {
+	function doSearch(val) {
 		console.log("Doing search for: " + val);
 		var resultPane = $('.resultsPane').empty();
 
         $.ajax({          
             type:  'GET',
-            url:   "http://semantic-quran.azure-mobile.net/api/tag/",
+            url:   "http://semantic-quran.azure-mobile.net/api/tag/" + val,
             dataType: 'json',              
             success: function(data) {
 				if (data && data.length > 0) {
@@ -206,13 +261,32 @@
          });
 
 		// Add the search to our recent searches
-		if(typeof(Storage) !== "undefined") {
-			if (!localStorage.tagMRU) {
-				localStorage.tagMRU = [];
-			}
-
-			//localStorage.tagMRU.push(val)
+		tagsMRU.unshift(val);
+		tagsMRU = tagsMRU.slice(0, 10);
+		updateMRU();
+	}
+	
+	function doViewPassage(surah, ayahStart, ayahEnd) {
+		var resultPane = $('.resultsPane').empty();
+		
+		var url = "";
+		if (ayahStart && ayahEnd) {
+			url = "http://semantic-quran.azure-mobile.net/api/verse/" + surah + "/" + ayahStart + "-" + ayahEnd;
 		}
+		else {
+			url = "http://semantic-quran.azure-mobile.net/api/verse/" + surah;
+		}
+		
+        $.ajax({          
+            type:  'GET',
+            url:  url,
+            dataType: 'json',              
+            success: function(data) {
+				if (data && data.length > 0) {
+					loadResults(data);
+				}
+            }
+         });
 	}
 
 	function loadResults(data) {
@@ -224,10 +298,10 @@
 			var wrapper = $('<div class="ayahWrapper ui-block-a">')
 				.appendTo(result);
 			var ayah = $('<div class="ayah"></div>')
-				.text(row.arabic)
+				.text(row.quran.text)
 				.appendTo(wrapper);
 			var translation = $('<div class="translation"></div>')
-				.text(row.english)
+				.text(row.content[0].text)
 				.appendTo(wrapper);
 			var tagGroup = $('<ul></ul>')
 				.appendTo(wrapper);
@@ -235,13 +309,19 @@
 				.text('[' + row.surah + ':' + row.verse + ']')
 				.appendTo(result);
 
+			var audioPlayer = $(
+				'<audio controls preload="metadata">' +
+  					'<source src="' + row.audio.mp3.url + '" type="audio/mpeg">' +
+  					'<source src="' + row.audio.ogg.url + '" type="audio/ogg">' +
+				'</audio>').appendTo(wrapper);
+
 			// Add all the tags to the row
 			$.each(row.tags, function (j, tag) {
-				$("<li class='tag'></li>")
-					.text(tag)
-					.appendTo(tagGroup);
+				var tagElement = $("<li class='tag'></li>").appendTo(tagGroup);
+				tagElement.append('<span class="tagName">' + tag + '</span>');
+				tagElement.append('<span class="delete">x</span>');
 			});
-
+			
 			var addButton = $('<li class="addTag tag">')
 				.text("+")
 				.attr("surahNum", row.surah)
@@ -249,16 +329,47 @@
 				.appendTo(tagGroup);
 		});
 	}
+	
+	(function initializeSurahDropdowns() {
+		var surahSelector = $("#surahSelect");
+		
+        $.ajax({          
+            type:  'GET',
+            url:   "http://semantic-quran.azure-mobile.net/api/surah",
+            dataType: 'json',
+            success: function(data) {
+				if (data && data.length > 0) {
+					surahSelector.empty();
+					
+					$.each(data, function (i, surahData) {
+						var surahEntry = $('<option value="' + surahData.id + '">' + surahData.name.simple + '</option>').appendTo(surahSelector);
+					});
+				}
+            }
+         });
+	})();
 
 	$(function () {
 		$("#contentBody").on("click", ".tag", function() {
 			var $this = $(this);
 
 			if (!$this.hasClass("addTag")) {
-				var val = $(this).text();
-				doSeatch(val);
+				var val = $(".tagName", $this).text();
+				doSearch(val);
 			}
 		});
+		
+		$("#contentBody").on("click", "span.delete", function() {
+			var $this = $(this);
+			var tag = $(this).attr("tag");
+			var surah = $(this).attr("surah");
+			var verse = $(this).attr("verse");
+			
+			doDeleteTag(tag, surah, verse);
+			
+			return false;
+		});
+		
 		$("#contentBody").on("click", ".addTag", function() {
 			var $this = $(this);
 
@@ -276,14 +387,28 @@
 				$("<li class='tag'></li>")
 					.text(tag)
 					.prependTo(tagGroup);
-
 			}
 			
 		});
 		$("#searchButton").click(function() {
 			var val = $("#search-tag").val();
-			doSeatch(val);
+			
+			if (val && val.length > 0) {
+				doSearch(val);
+			}
 		});
+		
+		$("#viewButton").click(function() {
+			var surah = $("#surahSelect").val();
+			var ayahStart = $("#ayahStartSelect").val();
+			var ayahEnd = $("#ayahEndSelect").val();
+			doViewPassage(surah, ayahStart, ayahEnd);
+		}).click();
+		
+		if(typeof(Storage) !== "undefined") {
+			tagsMRU = JSON.parse(localStorage.tagsMRU);
+			updateMRU();
+		}
 	});
 	</script>
 </body>
