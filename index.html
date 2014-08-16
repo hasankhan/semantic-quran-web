@@ -175,13 +175,13 @@
 	<!-- This is for JQuery Mobile dialog prompt. Doesnt look even close to right for me though. Not sure why. Not using it for now. -->
 	<a id="dialogLink" href="#addTagDialog" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop" style="display: none">Add a Tag</a>
 	<div data-role="popup" id="addTagDialog" class="ui-corner-all">
-	    <form>
-	        <div style="padding:10px 20px;">
-	            <h3>Add a Tag</h3>
-	            <input type="text" name="tagName" id="un" value="" placeholder="tagName">
-	            <button type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
-	        </div>
-	    </form>
+	    <form>
+	        <div style="padding:10px 20px;">
+	            <h3>Add a Tag</h3>
+	            <input type="text" name="tagName" id="un" value="" placeholder="tagName">
+	            <button type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
+	        </div>
+	    </form>
 	</div>
 	<!-- ------------------------------------------------------------------------ -->
 
@@ -194,49 +194,16 @@
 		console.log("Doing search for: " + val);
 		var resultPane = $('.resultsPane').empty();
 
-		var data = [
-		{
-			surah: -1,
-			verse: -1,
-			arabic: val,
-			english: val,
-			tags: [
-				val,
-				"tag1",
-				"tag2",
-				"tag3"
-			]
-		},
-		{
-			surah: -2,
-			verse: -2,
-			arabic: "Bismillah",
-			english: "In the name of Allah",
-			tags: [
-				val,
-			]
-		},
-		{
-			surah: -3,
-			verse: -3,
-			arabic: "Allahu Akbar",
-			english: "Allah is the greatest",
-			tags: [
-				val,
-				"tag1",
-			]
-		},
-		{
-			surah: -4,
-			verse: -4,
-			arabic: "Subhanallah",
-			english: "Glory be to Allah",
-			tags: [
-			]
-		},
-		];
-
-		loadResults(data);
+        $.ajax({          
+            type:  'GET',
+            url:   "http://semantic-quran.azure-mobile.net/api/tag/",
+            dataType: 'json',              
+            success: function(data) {
+				if (data && data.length > 0) {
+					loadResults(data);
+				}
+            }
+         });
 
 		// Add the search to our recent searches
 		if(typeof(Storage) !== "undefined") {
@@ -244,7 +211,7 @@
 				localStorage.tagMRU = [];
 			}
 
-			localStorage.tagMRU.push(row)
+			//localStorage.tagMRU.push(val)
 		}
 	}
 
