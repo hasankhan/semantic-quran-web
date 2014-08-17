@@ -152,11 +152,14 @@
 				float: left;
 				width: 40px;
 			}
-			/* Smartphones (portrait and landscape) ----------- */
-			@media only screen and (max-device-width : 600px) {
-				#ribbon {
-					display: none;
-				}
+			#recentlyAddedTags {
+				max-width: 300px;
+				margin: 0 auto;
+				padding: 10px;
+			}
+			#addTagDialogButton {
+				max-width: 250px;
+				margin: 0 auto;
 			}
 		</style>
 	</head>
@@ -173,8 +176,7 @@
 						<!--<label for="surahSelect" class="select">Surah</label>-->
 						<select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
 							<option value="1">Al-Fatihah</option>
-						</select>
-						<button id="viewButton" type="button">View</button>
+						</select>						
 					</div>
 					<div id="searchArea" class="ui-block-b">
 						<h3>Search Tags</h3>
@@ -186,19 +188,28 @@
 						<h3>Suggested Tags</h3>
 						<ul>
 							<li class="tag">
-								<span class="tagName">Marriage</span>
+								<span class="tagName">marriage</span>
 							</li>
 							<li class="tag">
-								<span class="tagName">Parenthood</span>
+								<span class="tagName">worship</span>
 							</li>
 							<li class="tag">
-								<span class="tagName">Prayer</span>
+								<span class="tagName">dua</span>
 							</li>
 							<li class="tag">
-								<span class="tagName">Fasting</span>
+								<span class="tagName">shaytan</span>
 							</li>
 							<li class="tag">
-								<span class="tagName">Hajj</span>
+								<span class="tagName">jinn</span>
+							</li>
+							<li class="tag">
+								<span class="tagName">heaven</span>
+							</li>
+							<li class="tag">
+								<span class="tagName">magic</span>
+							</li>
+							<li class="tag">
+								<span class="tagName">hell</span>
 							</li>
 						</ul>
 					</div>
@@ -212,20 +223,21 @@
 		</div>
 		<!-- Github ribbon -->
 		<a id="ribbon" href="https://github.com/hasankhan/semantic-quran-web"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
-		<!-- This is for JQuery Mobile dialog prompt. -->
+
 		<a id="dialogLink" href="#addTagDialog" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a"
 		data-transition="pop" style="display: none">Add a Tag</a>
 		<div data-role="popup" id="addTagDialog" class="ui-corner-all">
 			<div style="padding:10px 20px;">
 				<h3>Please contribute a thoughtful tag for this ayah.</h3>
-				<input type="text" name="tagName" value="" id="addTagDialogTextBox"
-				placeholder="(ex: Mercy-of-Allah)">
+				<input type="text" name="tagName" value="" id="addTagDialogTextBox" placeholder="(ex: Mercy-of-Allah)">
+				<ul id="recentlyAddedTags"></ul>
 				<button id="addTagDialogButton" type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
 			</div>
 		</div>
-		<!-- ------------------------------------------------------------------------ -->
+		
 		<script type="text/javascript">
 			var tagsMRU = [];
+			var tagsRecentlyAdded = [];
 			var context = null;
 			
 			function doAddTag(val, surahNum, verseNum) {
@@ -243,6 +255,21 @@
 						verse: verseNum
 					}
 		         });
+				 
+				// Add the tag to our recently added tags
+				var isInList = false;
+				$.each(tagsRecentlyAdded, function(i, entry) {
+					if(entry === val){
+						isInList = true;
+						return false;
+					}
+				});
+				
+				if(!isInList) {
+					tagsRecentlyAdded.unshift(val);
+					tagsRecentlyAdded = tagsRecentlyAdded.slice(0, 10);
+					updateRecentlyAddedTags();
+				}
 				 
 				 return promise;
 			}
@@ -271,6 +298,18 @@
 					localStorage.tagsMRU = JSON.stringify(tagsMRU);
 				}
 			}
+			
+			function updateRecentlyAddedTags() {
+				var container = $('#recentlyAddedTags').empty();
+				$.each(tagsRecentlyAdded, function(i, tag) {
+					var tagElement = $("<li class='tag recentTag'></li>").appendTo(container);
+					tagElement.append('<span class="tagName">' + tag + '</span>');
+				});
+				
+				if(typeof(Storage) !== "undefined") {
+					localStorage.tagsRecentlyAdded = JSON.stringify(tagsRecentlyAdded);
+				}
+			}
 		
 			function doSearch(val) {
 				console.log("Doing search for: " + val);
@@ -288,17 +327,51 @@
 		         });
 		
 				// Add the search to our recent searches
-				tagsMRU.unshift(val);
-				tagsMRU = tagsMRU.slice(0, 7);
-				updateMRU();
+				var isInList = false;
+				$.each(tagsMRU, function(i, entry) {
+					if(entry === val){
+						isInList = true;
+						return false;
+					}
+				});
+				
+				if(!isInList) {
+					tagsMRU.unshift(val);
+					tagsMRU = tagsMRU.slice(0, 7);
+					updateMRU();
+				}
 			}
 			
 			function doViewPassage(surah, ayahStart, ayahEnd) {
 				var resultPane = $('.resultsPane').empty();
 				
+				loadVerses(surah, ayahStart, ayahEnd);
+				
+				window.surah= surah;
+				window.ayahStart = ayahStart || 1;
+				window.ayahEnd = ayahEnd || 50;
+			}
+			
+			/*$(function(){
+				var theWindow = $(window);
+				var theDoc = $(document);
+				theWindow.scroll(function() { // save this please
+				   if(theWindow.scrollTop() + theWindow.height() > theDoc.height() - 200) {
+					   if (window.loading) {
+							return;
+						}
+					   window.ayahStart+=50;
+					   window.ayahEnd+=50;
+				       loadVerses(window.surah, window.ayahStart, window.ayahStart);
+				   }
+				});
+			});*/
+			
+			function loadVerses(surah, start, end) {				
+				window.loading = true;
 				var url = "";
-				if (ayahStart && ayahEnd) {
-					url = "http://semantic-quran.azure-mobile.net/api/verse/" + surah + "/" + ayahStart + "-" + ayahEnd;
+				if (start && end) {
+					url = "http://semantic-quran.azure-mobile.net/api/verse/" + surah + "/" + start + "-" + end;
 				}
 				else {
 					url = "http://semantic-quran.azure-mobile.net/api/verse/" + surah;
@@ -311,6 +384,9 @@
 		            success: function(data) {
 						if (data && data.length > 0) {
 							loadResults(data);
+							setTimeout(function(){
+								window.loading = false;
+							}, 5000);
 						}
 		            }
 		         });
@@ -319,9 +395,9 @@
 			function loadResults(data) {
 				$.each(data, function(i, row) {
 					var resultPane = $('.resultsPane');
-					var result = $('<div class="result" style="display: hidden">')
-						.appendTo(resultPane)
-						.show(1000);
+					var result = $('<div class="result">')
+						.fadeIn("slow")
+						.appendTo(resultPane);
 					var wrapper = $('<div class="ayahWrapper">')
 						.appendTo(result);
 					var ayahRef = $('<div class="ayahRef"></div>')
@@ -337,11 +413,26 @@
 						.appendTo(wrapper);
 		
 					var audioPlayer = $(
-						'<audio controls preload="metadata">' +
+						'<audio controls preload="none">' +
 		  					'<source src="' + row.audio.mp3.url + '" type="audio/mpeg">' +
 		  					'<source src="' + row.audio.ogg.url + '" type="audio/ogg">' +
 						'</audio>').appendTo(wrapper);
 					$("<div class='clear'>").appendTo(wrapper);
+					
+					window.lastPlayer;		
+					audioPlayer.on('play', function() {
+						if (window.lastPlayer) {
+							if (window.lastPlayer.pause) {
+								window.lastPlayer.pause();
+							}
+							if (window.lastPlayer[0] && window.lastPlayer[0].pause) {
+								window.lastPlayer[0].pause();
+							}
+							window.lastPlayer.css('width', '40px');
+						}
+						window.lastPlayer = $(this)
+						window.lastPlayer.css('width', '200px');
+					});			
 		
 					// Add all the tags to the row
 					$.each(row.tags, function (j, tag) {
@@ -364,11 +455,23 @@
 				});
 				
 				window.scroll(0, 0);
+			}			
+			
+			var lastSurah;
+			function onSurahChanged() {
+					var surah = $("#surahSelect").val();
+					if (surah == lastSurah) {
+						return;
+					}
+					lastSurah = surah;
+					var ayahStart = $("#ayahStartSelect").val();
+					var ayahEnd = $("#ayahEndSelect").val();
+					doViewPassage(surah, ayahStart, ayahEnd);
 			}
 			
 			(function initializeSurahDropdowns() {
 				var surahSelector = $("#surahSelect");
-				
+				surahSelector.click(onSurahChanged);
 		        $.ajax({          
 		            type:  'GET',
 		            url:   "http://semantic-quran.azure-mobile.net/api/surah",
@@ -378,7 +481,7 @@
 							surahSelector.empty();
 							
 							$.each(data, function (i, surahData) {
-								var surahEntry = $('<option value="' + surahData.id + '">' + surahData.name.simple + '</option>').appendTo(surahSelector);
+								var surahEntry = $('<option value="' + surahData.id + '">' + surahData.id + ': ' + surahData.name.simple + '</option>').appendTo(surahSelector);
 							});
 						}
 		            }
@@ -389,7 +492,7 @@
 				$("#contentBody").on("click", ".tag", function() {
 					var $this = $(this);
 		
-					if (!$this.hasClass("addTag")) {
+					if (!$this.hasClass("addTag") && !$this.hasClass("recentTag")) {
 						var val = $(".tagName", $this).text();
 						doSearch(val);
 					}
@@ -407,62 +510,55 @@
 				});
 				
 				$("#addTagDialogButton").click(function () {
-					var tag = $("#addTagDialogTextBox").val();
+					var $textBox = $("#addTagDialogTextBox");
+					var tags = $textBox.val();
 					var surahNum = context.attr("surahNum");
 					var verseNum = context.attr("verseNum");
 					
-					if (tag != null && tag.length>0) {
-						// Send the new tag to the server				
-						doAddTag(tag, surahNum, verseNum).done(function (val) {
-							console.log("Successfully Added: " + val.text);
-							
-							// Update the local row
-							var tagGroup = context.parent();					
-							var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
-							tagElement.append('<span class="tagName">' + val.text + '</span>');
-							
-							var deleteElement = $('<span class="delete">x</span>')
-								.attr("tag", val.text)
-								.attr("surah", surahNum)
-								.attr("verse", verseNum);
+					$textBox.val('');
+					
+					if (tags != null && tags.length>0) {
+						var values = tags.split(",");
+						$.each(values, function (i, value) {
+							doAddTag(value, surahNum, verseNum).done(function (val) {
+								console.log("Successfully Added: " + val.text);
 								
-							tagElement.append(deleteElement);
-						});
+								// Update the local row
+								var tagGroup = context.parent();					
+								var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
+								tagElement.append('<span class="tagName">' + val.text + '</span>');
+								
+								var deleteElement = $('<span class="delete">x</span>')
+									.attr("tag", val.text)
+									.attr("surah", surahNum)
+									.attr("verse", verseNum);
+									
+								tagElement.append(deleteElement);
+							});
+						});				
 					}
 					
 					$("#addTagDialog").popup("close");
+					window.location.hash = "";
 					return false;
 				});
 				
 				$("#contentBody").on("click", ".addTag", function() {
 					context = $(this);
-					var dialog = $("#dialogLink").click(); // The JQuery Mobile dialog box doesnt seem to work well.
-					
-					/*
-					var tag = prompt("What tag should be added? Spaces will be replaced by dashes.");
-					
-					if (tag != null && tag.length>0) {
-						// Send the new tag to the server
-						var surahNum = $this.attr("surahNum");
-						var verseNum = $this.attr("verseNum");
-						
-						doAddTag(tag, surahNum, verseNum).done(function (val) {
-							console.log("Successfully Added: " + val);
-							
-							// Update the local row
-							var tagGroup = $this.parent();					
-							var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
-							tagElement.append('<span class="tagName">' + val + '</span>');
-							
-							var deleteElement = $('<span class="delete">x</span>')
-								.attr("tag", val)
-								.attr("surah", surahNum)
-								.attr("verse", verseNum);
-								
-							tagElement.append(deleteElement);
-						});
-					}*/
+					var textBox = $("#addTagDialogTextBox").val(""); 
+					var dialog = $("#dialogLink").click();
+					setTimeout(function () {
+						textBox.focus();
+					}, 500);
 				});
+				
+				$("#recentlyAddedTags").on("click", ".recentTag", function() {
+					var $this = $(this);
+					var $textBox = $("#addTagDialogTextBox");
+					var val = $(".tagName", $this).text();
+					$textBox.val(val);
+				});
+				
 				$("#searchButton").click(function() {
 					var val = $("#search-tag").val();
 					
@@ -471,16 +567,18 @@
 					}
 				});
 				
-				$("#viewButton").click(function() {
+				(function onSurahChanged() {
 					var surah = $("#surahSelect").val();
 					var ayahStart = $("#ayahStartSelect").val();
 					var ayahEnd = $("#ayahEndSelect").val();
 					doViewPassage(surah, ayahStart, ayahEnd);
-				}).click();
+				})();
 				
 				if(typeof(Storage) !== "undefined") {
 					tagsMRU = JSON.parse(localStorage.tagsMRU);
+					tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
 					updateMRU();
+					updateRecentlyAddedTags();
 				}
 			});
 		</script>
