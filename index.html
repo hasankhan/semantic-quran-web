@@ -219,6 +219,7 @@
 					</div>
 				</div>
 				<div class="resultsPane"></div>
+				<!--<button id="loadMore" type="button">Load more</button>-->
 			</div>
 		</div>
 		<!-- Github ribbon -->
@@ -312,6 +313,9 @@
 			}
 		
 			function doSearch(val) {
+				window.lastSurah = null;
+				window.enableAutoScroll = false;
+				
 				console.log("Doing search for: " + val);
 				var resultPane = $('.resultsPane').empty();
 		
@@ -321,7 +325,7 @@
 		            dataType: 'json',              
 		            success: function(data) {
 						if (data && data.length > 0) {
-							loadResults(data);
+							loadResults(data, true);
 						}
 		            }
 		         });
@@ -343,31 +347,36 @@
 			}
 			
 			function doViewPassage(surah, ayahStart, ayahEnd) {
-				var resultPane = $('.resultsPane').empty();
+				window.enableAutoScroll = true;
 				
-				loadVerses(surah, ayahStart, ayahEnd);
+				var resultPane = $('.resultsPane').empty();
+				$('#loadMore').show();
+				loadVerses(surah, ayahStart, ayahEnd, true);
 				
 				window.surah= surah;
 				window.ayahStart = ayahStart || 1;
 				window.ayahEnd = ayahEnd || 50;
 			}
-			
-			/*$(function(){
-				var theWindow = $(window);
-				var theDoc = $(document);
-				theWindow.scroll(function() { // save this please
-				   if(theWindow.scrollTop() + theWindow.height() > theDoc.height() - 200) {
-					   if (window.loading) {
-							return;
-						}
-					   window.ayahStart+=50;
-					   window.ayahEnd+=50;
-				       loadVerses(window.surah, window.ayahStart, window.ayahStart);
+									
+			$(function(){									
+				$(window).scroll(function() {
+				   if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+				       scrollMore();
 				   }
 				});
-			});*/
+				
+				function scrollMore() {
+					if (!window.enableAutoScroll) {
+						return;
+					}
+					
+				   window.ayahStart+=50;
+				   window.ayahEnd+=50;
+				   loadVerses(window.surah, window.ayahStart, window.ayahEnd, false);
+				}							
+			});
 			
-			function loadVerses(surah, start, end) {				
+			function loadVerses(surah, start, end, animate) {				
 				window.loading = true;
 				var url = "";
 				if (start && end) {
@@ -383,21 +392,23 @@
 		            dataType: 'json',              
 		            success: function(data) {
 						if (data && data.length > 0) {
-							loadResults(data);
-							setTimeout(function(){
-								window.loading = false;
-							}, 5000);
+							loadResults(data, animate);
+							if (data.length < 50) {
+								$('#loadMore').hide();
+							}
 						}
 		            }
 		         });
 			}
 		
-			function loadResults(data) {
+			function loadResults(data, animate) {
 				$.each(data, function(i, row) {
 					var resultPane = $('.resultsPane');
-					var result = $('<div class="result">')
-						.fadeIn("slow")
-						.appendTo(resultPane);
+					var result = $('<div class="result">');
+					if (animate) {
+						result.fadeIn("slow")
+					}
+					result.appendTo(resultPane);
 					var wrapper = $('<div class="ayahWrapper">')
 						.appendTo(result);
 					var ayahRef = $('<div class="ayahRef"></div>')
@@ -454,16 +465,18 @@
 						.appendTo(tagGroup);
 				});
 				
-				window.scroll(0, 0);
+				if (animate) {
+					window.scroll(0, 0);
+				}
 			}			
 			
-			var lastSurah;
+			window.lastSurah = null;
 			function onSurahChanged() {
 					var surah = $("#surahSelect").val();
-					if (surah == lastSurah) {
+					if (surah == window.lastSurah) {
 						return;
 					}
-					lastSurah = surah;
+					window.lastSurah = surah;
 					var ayahStart = $("#ayahStartSelect").val();
 					var ayahEnd = $("#ayahEndSelect").val();
 					doViewPassage(surah, ayahStart, ayahEnd);
