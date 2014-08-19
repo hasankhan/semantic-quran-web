@@ -161,6 +161,9 @@
 				max-width: 250px;
 				margin: 0 auto;
 			}
+			#loadMore {
+				display: none;
+			}
 		</style>
 	</head>
 	<body>
@@ -350,8 +353,7 @@
 			function doViewPassage(surah, ayahStart, ayahEnd) {
 				window.enableAutoScroll = true;
 				
-				var resultPane = $('.resultsPane').empty();
-				$('#loadMore').show();
+				var resultPane = $('.resultsPane').empty();				
 				loadVerses(surah, ayahStart, ayahEnd, true);
 				
 				window.surah= surah;
@@ -398,6 +400,9 @@
 							loadResults(data, animate);
 							if (data.length < 50) {
 								$('#loadMore').hide();
+							}
+							else {
+								$('#loadMore').show();
 							}
 						}
 		            }
@@ -611,5 +616,20 @@
 		  ga('require', 'displayfeatures');
 		  ga('send', 'pageview');		
 		</script>
+		<script src='http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js'></script>
+		<script>
+			var client = new WindowsAzure.MobileServiceClient('https://semantic-quran.azure-mobile.net/', 'okajHbuHsfhRmylXmwQgOKAsnmUyKG49');
+			$(function(){
+				var loginBtn = $("#login");
+				loginBtn.click(function(){
+					client.login("facebook").done(function (results) {
+						loginBtn.hide();
+				    }, function (err) {
+				         alert("Error: " + err);
+				    });
+				});
+			});			
+		</script>
+		<button id="login">Login with Facebook</button>
 	</body>
 </html>
