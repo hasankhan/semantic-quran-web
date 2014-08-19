@@ -315,7 +315,8 @@
 			function doSearch(val) {
 				window.lastSurah = null;
 				window.enableAutoScroll = false;
-				
+				$('#loadMore').hide();
+                
 				console.log("Doing search for: " + val);
 				var resultPane = $('.resultsPane').empty();
 		
