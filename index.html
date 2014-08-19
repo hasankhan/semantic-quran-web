@@ -533,7 +533,7 @@
 					$textBox.val('');
 					
 					if (tags != null && tags.length>0) {
-						var values = tags.split(",");
+						var values = tags.split(/[,;]/);
 						$.each(values, function (i, value) {
 							doAddTag(value, surahNum, verseNum).done(function (val) {
 								console.log("Successfully Added: " + val.text);
@@ -570,6 +570,10 @@
 					var $this = $(this);
 					var $textBox = $("#addTagDialogTextBox");
 					var val = $(".tagName", $this).text();
+                    var existing = $textBox.val();
+                    if (existing) {
+                        val = existing + ',' + val;
+                    }
 					$textBox.val(val);
 				});
 				
