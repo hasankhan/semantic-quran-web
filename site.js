@@ -357,15 +357,14 @@ $(function () {
 	})();
 	
 	if(typeof(Storage) !== "undefined") {
-		try {
-		tagsMRU = JSON.parse(localStorage.tagsMRU);
-		tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
-		updateMRU();
-		updateRecentlyAddedTags();
-		}
-		catch (e) {
-			console.log('failed to read local storage', e);
-		}
+		if (localStorage.tagsMRU) {
+                tagsMRU = JSON.parse(localStorage.tagsMRU);
+                updateMRU();
+        }
+        if (localStorage.tagsRecentlyAdded) {
+            tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);		
+            updateRecentlyAddedTags();
+        }
 	}
 });
 
