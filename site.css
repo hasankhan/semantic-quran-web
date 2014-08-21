@@ -1,0 +1,158 @@
+.clear {
+	clear: both;
+}
+.ui-page { 			
+	background: -webkit-linear-gradient(#A4BCC2, #DADADA); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(#A4BCC2, #DADADA); /* For Opera 11.1 to 12.0 */
+ 	background: -moz-linear-gradient(#A4BCC2, #DADADA); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(#A4BCC2, #DADADA); /* Standard syntax */
+}
+.header {
+	width: 100%;
+	padding-bottom: 10px;
+	border: 1px solid black;
+	text-shadow: none;
+	border-radius: 0 0 50px 50px;
+	border-bottom-width: 0px;
+	text-align: center;
+	
+	background: -webkit-linear-gradient(#2A6F6C, #339D79); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(#2A6F6C, #339D79); /* For Opera 11.1 to 12.0 */
+ 	background: -moz-linear-gradient(#2A6F6C, #339D79); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(#2A6F6C, #339D79); /* Standard syntax */
+}
+.header h1 {
+	font-size: 40px;
+	padding: 5px 0 0 20px;
+	margin: 0;
+}
+.header h2 {
+	font-size: 20px;
+	padding: 0 0 0 20px;
+	margin: 0;
+}
+#contentBody {
+	text-shadow: none;
+	margin-bottom: 20px;
+}
+#contentArea {
+	width: 80%;
+	margin: 0 auto;
+}
+#browseArea .ui-select,
+#searchArea .ui-input-search {
+	width: 45%;
+	float: left;
+}
+#viewButton,
+#searchButton {
+	width: 30%;
+	float: left;
+	margin: 7px;
+}
+#searchButton {
+	margin-top: 10px;
+}
+.sidePanel {
+	border-bottom: 1px solid black;
+	padding: 0 10px 10px 10px;
+	
+	background: -webkit-linear-gradient(#339D79, #56D27A); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(#339D79, #56D27A); /* For Opera 11.1 to 12.0 */
+ 	background: -moz-linear-gradient(#339D79, #56D27A); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(#339D79, #56D27A); /* Standard syntax */
+}
+.sidePanel h3 {
+	margin: 15px 0 10px 0;
+	font-size: 15px;
+}
+.sidePanel button {
+	margin: 5px 0px;
+	padding: 5px 8px;
+}
+.sidePanel .ui-block-a,
+.sidePanel .ui-block-b {
+	width: 30%;
+}
+.sidePanel .ui-block-c,
+.sidePanel .ui-block-d {
+	width: 20%;
+}
+.tagGroupHeader {
+	padding-left: 10px;
+}
+.resultsPane {
+}
+.resultsPane .ui-block-a {
+	width: 88%;
+}
+.resultsPane .ui-block-b {
+	width: 12%;
+}
+.result .ayahWrapper {
+	background-color: beige;
+	border: 1px solid black;
+	border-top-width: 0;
+	text-align: right;
+	padding: 10px;
+	
+	background: -webkit-linear-gradient(left, #F3FCEB , #E3E5CD); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(right, #F3FCEB, #E3E5CD); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(right, #F3FCEB, #E3E5CD); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(to right, #F3FCEB , #E3E5CD); /* Standard syntax */
+}
+.result .ayah {
+	font-size: 35px;
+}
+.result .ayahRef {
+	font-size: 25px; 
+	padding-left: 10px;
+	float: left;
+}
+.result .translation {
+	font-size: 15px;
+	padding-top: 5px;
+}
+ul{
+	padding: 0;
+	margin: 0;
+}
+li.tag {
+	display: inline-block;
+	list-style-type: none;
+	border: 1px solid gray;
+	border-radius: 10px;
+	background-color: beige;
+	cursor: pointer;
+	padding: 5px;
+	margin: 1px;
+	font-size: 10px;
+}
+li.addTag {
+	background-color: lightgreen;
+}
+span.delete {
+	padding-left: 5px;
+	color: red;
+}
+.resultsPane ul {
+	margin-top: 10px;
+	float: right;
+}
+audio {
+	padding-top: 5px;
+	float: left;
+	width: 40px;
+}
+#recentlyAddedTags {
+	max-width: 300px;
+	margin: 0 auto;
+	padding: 10px;
+}
+#addTagDialogButton {
+	max-width: 250px;
+	margin: 0 auto;
+}
+#loadMore {
+	display: none;
+}
