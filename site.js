@@ -1,23 +1,11 @@
+var client = new WindowsAzure.MobileServiceClient('https://semantic-quran.azure-mobile.net/', 'okajHbuHsfhRmylXmwQgOKAsnmUyKG49');
 var tagsMRU = [];
 var tagsRecentlyAdded = [];
 var context = null;
 
-function doAddTag(val, surahNum, verseNum) {
-	var deferred = $.Deferred();
-	
+function doAddTag(val, surahNum, verseNum) {	
 	console.log("Adding tag: " + val + " to " + "[" + surahNum + ":" + verseNum + "]");
-	
-	var promise = $.ajax({          
-        type:  'POST',
-        url:   "http://semantic-quran.azure-mobile.net/api/tag",
-        dataType: 'json',
-		data: {
-			tag: val,
-			surah: surahNum,
-			verse: verseNum
-		}
-     });
-	 
+			 
 	// Add the tag to our recently added tags
 	var isInList = false;
 	$.each(tagsRecentlyAdded, function(i, entry) {
@@ -31,22 +19,28 @@ function doAddTag(val, surahNum, verseNum) {
 		tagsRecentlyAdded.unshift(val);
 		tagsRecentlyAdded = tagsRecentlyAdded.slice(0, 10);
 		updateRecentlyAddedTags();
-	}
-	 
-	 return promise;
+	}	
+	
+	var promise = client.invokeApi('tag', {
+		method: 'post',
+		body: {
+			tag: val,
+			surah: surahNum,
+			verse: verseNum
+		}
+	});
+		
+	return promise;
 }
 
 function doDeleteTag(val, surahNum, verseNum) {
 	console.log("Deleting tag: " + val + " to " + "[" + surahNum + ":" + verseNum + "]");
 	
-	$.ajax({          
-        type:  'DELETE',
-        url:   "http://semantic-quran.azure-mobile.net/api/tag/" + val + "/" + surahNum + "/" + verseNum,
-        dataType: 'json',
-        success: function() {
-			console.log("Successfully Deleted")
-        }
-     });
+	client.invokeApi('tag/' + val + '/' + surahNum + '/' + verseNum, {
+		method: 'delete'
+	}).done(function(){
+		console.log("Successfully Deleted")
+	});		
 }
 
 function updateMRU() {
@@ -299,7 +293,8 @@ $(function () {
 		if (tags != null && tags.length>0) {
 			var values = tags.split(/[,;]/);
 			$.each(values, function (i, value) {
-				doAddTag(value, surahNum, verseNum).done(function (val) {
+				doAddTag(value, surahNum, verseNum).done(function (req) {
+					var val = req.result;
 					console.log("Successfully Added: " + val.text);
 					
 					// Update the local row
@@ -367,8 +362,6 @@ $(function () {
         }
 	}
 });
-
-var client = new WindowsAzure.MobileServiceClient('https://semantic-quran.azure-mobile.net/', 'okajHbuHsfhRmylXmwQgOKAsnmUyKG49');
 $(function(){
 	var loginBtn = $("#login");
 	loginBtn.click(function(){
