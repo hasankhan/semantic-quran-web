@@ -74,17 +74,14 @@ function doSearch(val) {
     
 	console.log("Doing search for: " + val);
 	var resultPane = $('.resultsPane').empty();
-
-    $.ajax({          
-        type:  'GET',
-        url:   "http://semantic-quran.azure-mobile.net/api/tag/" + val,
-        dataType: 'json',              
-        success: function(data) {
-			if (data && data.length > 0) {
-				loadResults(data, true);
-			}
+    
+    client.invokeApi('tag/' + val, {
+		method: 'get',
+	}).done(function(req) {
+        if (req.result && req.result.length > 0) {
+            loadResults(req.result, true);
         }
-     });
+    });    
 
 	// Add the search to our recent searches
 	var isInList = false;
@@ -135,30 +132,28 @@ $(function(){
 
 function loadVerses(surah, start, end, animate) {				
 	window.loading = true;
-	var url = "";
+	var api = 'verse/' + surah;
+        
 	if (start && end) {
-		url = "http://semantic-quran.azure-mobile.net/api/verse/" + surah + "/" + start + "-" + end;
+		api += "/" + start + "-" + end;
 	}
-	else {
-		url = "http://semantic-quran.azure-mobile.net/api/verse/" + surah;
-	}
-	
-    $.ajax({          
-        type:  'GET',
-        url:  url,
-        dataType: 'json',              
-        success: function(data) {
-			if (data && data.length > 0) {
-				loadResults(data, animate);
-				if (data.length < 50) {
-					$('#loadMore').hide();
-				}
-				else {
-					$('#loadMore').show();
-				}
-			}
+	else if (start) {
+        api += "/" + start;
+    }
+    
+    client.invokeApi(api, {
+		method: 'get',
+	}).done(function(req) {
+        if (req.result && req.result.length > 0) {
+            loadResults(req.result, animate);
+            if (req.result.length < 50) {
+                $('#loadMore').hide();
+            }
+            else {
+                $('#loadMore').show();
+            }
         }
-     });
+    });
 }
 
 function loadResults(data, animate) {
@@ -245,20 +240,16 @@ function onSurahChanged() {
 (function initializeSurahDropdowns() {
 	var surahSelector = $("#surahSelect");
 	surahSelector.click(onSurahChanged);
-    $.ajax({          
-        type:  'GET',
-        url:   "http://semantic-quran.azure-mobile.net/api/surah",
-        dataType: 'json',
-        success: function(data) {
-			if (data && data.length > 0) {
-				surahSelector.empty();
-				
-				$.each(data, function (i, surahData) {
-					var surahEntry = $('<option value="' + surahData.id + '">' + surahData.id + ': ' + surahData.name.simple + '</option>').appendTo(surahSelector);
-				});
-			}
+    client.invokeApi('surah', {
+		method: 'get',
+	}).done(function(req) {
+        if (req.result && req.result.length > 0) {
+            surahSelector.empty();		
+            req.result.forEach(function (surahData, i) {
+                var surahEntry = $('<option value="' + surahData.id + '">' + surahData.id + ': ' + surahData.name.simple + '</option>').appendTo(surahSelector);
+            });
         }
-     });
+    });	     
 })();
 
 $(function () {
