@@ -1,95 +1,98 @@
 <html>
-	<head>
-		<title>Symantic Quran</title>
-		<meta name="viewport" content="initial-scale=0.25">
-		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
-		<link rel="stylesheet" href="site.css" />
-		<script>
-		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-		
-		  ga('create', 'UA-29293370-3', 'auto');
-		  ga('send', 'pageview');		
-		</script>
-	</head>	
-	<body>
-		<div class="header">
-			<h1>Semantic Quran</h1>
-			<h2>Browse and search the Quran based on tags and semantic themes</h2>
-		</div>
-		<div id="contentBody">
-			<div id="contentArea">
-				<div class="sidePanel ui-grid-c">
-					<div id="browseArea" class="ui-block-a">
-						<h3>Browse Ayat</h3>
-						<!--<label for="surahSelect" class="select">Surah</label>-->
-						<select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
-							<option value="1">Al-Fatihah</option>
-						</select>						
-					</div>
-					<div id="searchArea" class="ui-block-b">
-						<h3>Search Tags</h3>
-						<!-- <label for="search-1">Search for a topic in the Quran. Results are crowd sourced and are constantly being improved.</label> -->
-						<input type="search" name="search-tag" id="search-tag" value="praise-of-Allah">
-						<button id="searchButton" type="button">Search</button>
-					</div>
-					<div id="suggestedTags" class="tagGroupHeader ui-block-c">
-						<h3>Suggested Tags</h3>
-						<ul>
-							<li class="tag">
-								<span class="tagName">marriage</span>
-							</li>
-							<li class="tag">
-								<span class="tagName">worship</span>
-							</li>
-							<li class="tag">
-								<span class="tagName">dua</span>
-							</li>
-							<li class="tag">
-								<span class="tagName">shaytan</span>
-							</li>
-							<li class="tag">
-								<span class="tagName">jinn</span>
-							</li>
-							<li class="tag">
-								<span class="tagName">heaven</span>
-							</li>
-							<li class="tag">
-								<span class="tagName">magic</span>
-							</li>
-							<li class="tag">
-								<span class="tagName">hell</span>
-							</li>
-						</ul>
-					</div>
-					<div id="lastUsedTags" class="tagGroupHeader ui-block-d">
-						<h3>Last Used Tags</h3>
-						<ul></ul>
-					</div>
-				</div>
-				<div class="resultsPane"></div>
-				<button id="loadMore" type="button">Load more</button>
-			</div>
-		</div>
-		<!-- Github ribbon -->
-		<a id="ribbon" href="https://github.com/hasankhan/semantic-quran-web"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+<head>
+    <title>Symantic Quran</title>
+    <meta name="viewport" content="initial-scale=0.25">
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
+    <link rel="stylesheet" href="site.css" />
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-		<a id="dialogLink" href="#addTagDialog" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a"
-		data-transition="pop" style="display: none">Add a Tag</a>
-		<div data-role="popup" id="addTagDialog" class="ui-corner-all">
-			<div style="padding:10px 20px;">
-				<h3>Please contribute a thoughtful tag for this ayah.</h3>
-				<input type="text" name="tagName" value="" id="addTagDialogTextBox" placeholder="(ex: Mercy-of-Allah)">
-				<ul id="recentlyAddedTags"></ul>
-				<button id="addTagDialogButton" type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
-			</div>
-		</div>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>		
-		<script src='http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js'></script>
-		<script type="text/javascript" src="site.js"></script>				
-		<button id="login">Login with Facebook</button>
-	</body>
+        ga('create', 'UA-29293370-3', 'auto');
+        ga('send', 'pageview');
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h1>Semantic Quran</h1>
+        <h2>Browse and search the Quran based on tags and semantic themes</h2>
+    </div>
+    <div id="contentBody">
+        <div id="contentArea">
+            <div class="sidePanel ui-grid-c">
+                <div id="browseArea" class="ui-block-a">
+                    <h3>Browse Ayat</h3>
+                    <!--<label for="surahSelect" class="select">Surah</label>-->
+                    <select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
+                        <option value="1">Al-Fatihah</option>
+                    </select>
+                </div>
+                <div id="searchArea" class="ui-block-b">
+                    <h3>Search Tags</h3>
+                    <!-- <label for="search-1">Search for a topic in the Quran. Results are crowd sourced and are constantly being improved.</label> -->
+                    <input type="search" name="search-tag" id="search-tag" value="praise-of-Allah">
+                    <button id="searchButton" type="button">Search</button>
+                </div>
+                <div id="suggestedTags" class="tagGroupHeader ui-block-c">
+                    <h3>Suggested Tags</h3>
+                    <ul>
+                        <li class="tag">
+                            <span class="tagName">marriage</span>
+                        </li>
+                        <li class="tag">
+                            <span class="tagName">worship</span>
+                        </li>
+                        <li class="tag">
+                            <span class="tagName">dua</span>
+                        </li>
+                        <li class="tag">
+                            <span class="tagName">shaytan</span>
+                        </li>
+                        <li class="tag">
+                            <span class="tagName">jinn</span>
+                        </li>
+                        <li class="tag">
+                            <span class="tagName">heaven</span>
+                        </li>
+                        <li class="tag">
+                            <span class="tagName">magic</span>
+                        </li>
+                        <li class="tag">
+                            <span class="tagName">hell</span>
+                        </li>
+                    </ul>
+                </div>
+                <div id="lastUsedTags" class="tagGroupHeader ui-block-d">
+                    <h3>Last Used Tags</h3>
+                    <ul></ul>
+                </div>
+            </div>
+            <div class="resultsPane"></div>
+            <button id="loadMore" type="button">Load more</button>
+        </div>
+    </div>
+    <!-- Github ribbon -->
+    <a id="ribbon" href="https://github.com/hasankhan/semantic-quran-web"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <a id="dialogLink" href="#addTagDialog" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a"
+       data-transition="pop" style="display: none">Add a Tag</a>
+    <div data-role="popup" id="addTagDialog" class="ui-corner-all">
+        <div style="padding:10px 20px;">
+            <h3>Please contribute a thoughtful tag for this ayah.</h3>
+            <input type="text" name="tagName" value="" id="addTagDialogTextBox" placeholder="(ex: Mercy-of-Allah)">
+            <ul id="recentlyAddedTags"></ul>
+            <button id="addTagDialogButton" type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
+        </div>
+    </div>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>
+    <script src='http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js'></script>
+    <script type="text/javascript" src="quranclient.js"></script>
+    <script type="text/javascript" src="site.js"></script>
+    <button id="login">Login with Facebook</button>
+</body>
 </html>
