@@ -3,9 +3,46 @@ var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHb
     tagsRecentlyAdded = [],
     context = null;
 
+// Prevents all anchor click handling
+$.mobile.linkBindingEnabled = false;
+
+// Disabling this will prevent jQuery Mobile from handling hash changes
+$.mobile.hashListeningEnabled = false;
+
+
+var Workspace = Backbone.Router.extend({
+    routes: {
+        "": "home",
+        "search/:tag": "search",
+        ":surah/:start-:end": "view",
+        ":surah/:start": "view",
+        ":surah": "view"
+    },
+
+    home: function () {
+        doViewPassage(1);
+    },
+
+    view: function (surah, start, end) {
+        doViewPassage(surah, start, end);
+    },
+
+    search: function (tag) {
+        doSearch(tag);
+    }
+
+});
+
+var router = new Workspace();
+Backbone.history.start();
+
 client.onLoading = function (loading) {
     if (loading) {
-        $.mobile.loading('show', { theme: $.mobile.loader.prototype.options.theme, msgText: 'Loading', textVisible: true });
+        $.mobile.loading('show', {
+            theme: $.mobile.loader.prototype.options.theme,
+            msgText: 'Loading',
+            textVisible: true
+        });
     }
     else {
         $.mobile.loading('hide');
@@ -220,9 +257,7 @@ function onSurahChanged() {
         return;
     }
     window.lastSurah = surah;
-    var ayahStart = $("#ayahStartSelect").val();
-    var ayahEnd = $("#ayahEndSelect").val();
-    doViewPassage(surah, ayahStart, ayahEnd);
+    router.navigate(surah, { trigger: true });
 }
 
 (function initializeSurahDropdowns() {
@@ -321,13 +356,6 @@ $(function () {
             doSearch(val);
         }
     });
-
-    (function onSurahChanged() {
-        var surah = $("#surahSelect").val();
-        var ayahStart = $("#ayahStartSelect").val();
-        var ayahEnd = $("#ayahEndSelect").val();
-        doViewPassage(surah, ayahStart, ayahEnd);
-    })();
 
     if (typeof (Storage) !== "undefined") {
         if (localStorage.tagsMRU) {
