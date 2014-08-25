@@ -336,7 +336,7 @@ $(function () {
     $("#contentBody").on("click", ".addTag", function () {
         context = $(this);
         var textBox = $("#addTagDialogTextBox").val("");
-        var dialog = $("#dialogLink").click();
+        $("#addTagDialog").popup('open');
         setTimeout(function () {
             textBox.focus();
         }, 500);
