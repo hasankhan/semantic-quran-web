@@ -28,7 +28,7 @@ var Workspace = Backbone.Router.extend({
     },
 
     search: function (tag) {
-        doSearch(tag);
+        onSearch(tag);
     }
 
 });
@@ -103,7 +103,11 @@ function updateRecentlyAddedTags() {
     }
 }
 
-function doSearch(val) {
+function doSearch(tag) {
+    router.navigate('search/' + tag, { trigger: true });
+}
+
+function onSearch(val) {
     window.lastSurah = null;
     window.enableAutoScroll = false;
     $('#loadMore').hide();

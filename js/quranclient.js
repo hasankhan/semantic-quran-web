@@ -5,58 +5,43 @@ var QuranClient = (function () {
     }
 
     QuranClient.prototype.addTag = function (surah, verse, tag) {
-        this._onLoad();
-        return this.client.invokeApi('tag', {
-            method: 'post',
-            body: {
-                surah: surah,
-                verse: verse,
-                tag: tag
-            }
-        }).then(this._onSuccess.bind(this), this._onError.bind(this));
+        return this._post('tag', {
+            surah: surah,
+            verse: verse,
+            tag: tag
+        });
     };
 
     QuranClient.prototype.removeTag = function (surah, verse, tag) {
-        this._onLoad();
-        return this.client.invokeApi('tag/' + tag + '/' + surah + '/' + verse, {
-            method: 'delete'
-        }).then(this._onSuccess.bind(this), this._onError.bind(this));
+        return this._del('tag/' + tag + '/' + surah + '/' + verse);
     };
 
     QuranClient.prototype.findVersesByTag = function (tag) {
-        this._onLoad();
-        return this.client.invokeApi('tag/' + tag, {
-            method: 'get',
-        }).then(this._onSuccess.bind(this), this._onError.bind(this));
+        return this._get('tag/' + tag);
     };
 
     QuranClient.prototype.getVersesByRange = function (surah, start, end) {
-        var uri = 'verse/' + surah;
+        var path = 'verse/' + surah;
 
         if (start && end) {
-            uri += "/" + start + "-" + end;
+            path += "/" + start + "-" + end;
         }
         else if (start) {
-            uri += "/" + start;
+            path += "/" + start;
         }
 
-        this._onLoad();
-        return this.client.invokeApi(uri, {
-            method: 'get',
-        }).then(this._onSuccess.bind(this), this._onError.bind(this));
+        return this._get(path);
     };
 
     QuranClient.prototype.listSurahs = function () {
-        this._onLoad();
-        return this.client.invokeApi('surah', {
-            method: 'get',
-        }).then(this._onSuccess.bind(this), this._onError.bind(this));
+        return this._get('surah');
     };
 
     QuranClient.prototype.login = function (provider) {
-        this._onLoad();
+        this._onLoading(true);
         return this.client.login("facebook")
-                          .then(this._onSuccess.bind(this), this._onError.bind(this));
+                          .then(this._onSuccess.bind(this),
+                                this._onError.bind(this));
     };
 
     QuranClient.prototype._onLoading = function (state) {
@@ -75,8 +60,31 @@ var QuranClient = (function () {
         throw err;
     };
 
-    QuranClient.prototype._onLoad = function () {
+    QuranClient.prototype._get = function (path) {
+        return this._invoke(path, {
+            method: 'get',
+        });
+    };
+
+    QuranClient.prototype._post = function (path, body) {
+        return this._invoke(path, {
+            method: 'post',
+            body: body
+        });
+    };
+
+    QuranClient.prototype._del = function (path, body) {
+        return this._invoke(path, {
+            method: 'delete',
+            body: body
+        });
+    };
+
+    QuranClient.prototype._invoke = function () {
         this._onLoading(true);
+        return this.client.invokeApi.apply(this.client, arguments)
+                                     .then(this._onSuccess.bind(this),
+                                           this._onError.bind(this));
     };
 
     return QuranClient;
