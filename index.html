@@ -19,32 +19,31 @@
 </head>
 
 <body>
-    <div data-role="page" class="ui-responsive-panel">
-        <div data-role="header" data-theme="a" data-position="fixed">
+    <div data-role="page">
+        <div data-role="header" data-theme="b" data-position="fixed">
+            <a href="javascript:void(0)" id="menuBtn" data-icon="bars" data-iconpos="notext">Menu</a>
             <h1>Semantic Quran</h1>
             <h2>Browse and search the Quran based on tags and semantic themes</h2>
-            <a href="javascript:void(0)" id="menuBtn" data-icon="bars"
-               data-iconpos="notext">Menu</a>
-            <!--<a href="javascript:void(0)" data-icon="plus" data-iconpos="notext">Add Tag</a>-->
+            <a href="javascript:void(0)" id="login" data-icon="user" data-iconpos="notext">Login</a>
         </div>
         <div data-role="content">
             <div class="resultsPane"></div>
             <button id="loadMore" type="button">Load more</button>
         </div>
-        <div data-role="panel" data-position="left" data-position-fixed="true" data-display="reveal" id="nav-panel" data-theme="a">
-            <ul data-role="listview" data-theme="a" data-divider-theme="a" style="margin-top:-16px;" class="nav-search">
-                <li data-filtertext="wai-aria voiceover accessibility screen reader">
+        <div data-role="panel" data-position="left" data-position-fixed="true" data-display="reveal" id="nav-panel">
+            <ul data-role="listview" style="margin-top:-16px;" class="nav-search">
+                <li data-filtertext="wai-aria">
                     <h3>Browse Ayat</h3>
                     <select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
                         <option value="1">Al-Fatihah</option>
                     </select>
                 </li>
-                <li data-filtertext="wai-aria voiceover accessibility screen reader">
+                <li data-filtertext="wai-aria">
                     <h3>Search Tags</h3>
                     <input type="search" name="search-tag" id="search-tag" value="">
                     <button id="searchButton" type="button">Search</button>
                 </li>
-                <li data-filtertext="wai-aria voiceover accessibility screen reader">
+                <li data-filtertext="wai-aria">
                     <h3>Suggested Tags</h3>
                     <ul>
                         <li class="tag">
@@ -61,7 +60,7 @@
                         </li>
                     </ul>
                 </li>
-                <li data-filtertext="wai-aria voiceover accessibility screen reader">
+                <li data-filtertext="wai-aria">
                     <h3>Last Used Tags</h3>
                     <ul id='lastUsedTags'></ul>
                 </li>
@@ -75,18 +74,14 @@
                        data-clear-btn="true" data-mini="true"
                        placeholder="(ex: heaven)">
                 <ul id="recentlyAddedTags"></ul>
-                <div class="ui-grid-a">
-                    <div class="ui-block-a">
-                        <a href="javascript:void(0)" data-rel="close" data-role="button" data-theme="c" data-mini="true">Cancel</a>
-                    </div>
-                    <div class="ui-block-b">
-                        <a id="addTagDialogButton" href="javascript:void(0)" data-rel="close" data-role="button" data-theme="b" data-mini="true">Save</a>
-                    </div>
+                <div data-inline="true">
+                    <a data-rel="close" data-theme="c" data-role="button" data-mini="true" data-inline="true">Cancel</a>
+                    <a id="addTagDialogButton" data-rel="close" data-theme="b" data-role="button" data-mini="true" data-inline="true">Save</a>
                 </div>
             </form>
         </div>
-        <div data-role="footer" data-theme="f">
-            <a href="https://github.com/hasankhan/semantic-quran-web">View source</a>
+        <div data-role="footer" data-theme="b">
+            <a href="https://github.com/hasankhan/semantic-quran-web" data-role="button" data-mini="true">View source</a>
         </div>
     </div>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -96,7 +91,6 @@
     <script src='http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js'></script>
     <script type="text/javascript" src="js/quranclient.js"></script>
     <script type="text/javascript" src="js/site.js"></script>
-    <button id="login">Login</button>
 </body>
 
 </html>

@@ -210,7 +210,7 @@ function loadResults(data, animate) {
             .text(row.content[0].text)
             .appendTo(wrapper);
 
-        var tagGroup = $('<ul></ul>')
+        var tagGroup = $('<ul id="tags' + row.surah + '_' + row.verse + '"></ul>')
             .appendTo(result);
 
         var audioPlayer = $(
@@ -248,6 +248,9 @@ function loadResults(data, animate) {
 
             tagElement.append(deleteElement);
         });
+
+        var addButton = $('<li class="addTag"><a href="javascript:void(0)" data-icon="tag" data-iconpos="notext" data-role="button">Add Tag</a></li>');
+        tagGroup.append(tagGroup);
 
         result.attr("surahNum", row.surah)
               .attr("verseNum", row.verse);
@@ -319,7 +322,7 @@ $(function () {
                     console.log("Successfully Added: " + val.text);
 
                     // Update the local row
-                    var tagGroup = context.parent();
+                    var tagGroup = $('#tags' + surahNum + '_' + verseNum);
                     var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
                     tagElement.append('<span class="tagName">' + val.text + '</span>');
 
@@ -337,7 +340,8 @@ $(function () {
         return false;
     });
 
-    $("body").on("click", ".result", function () {
+    $("body").on("click", ".addTag", function (event) {
+
         context = $(this);
         var surahNum = context.attr("surahNum");
         var verseNum = context.attr("verseNum");
