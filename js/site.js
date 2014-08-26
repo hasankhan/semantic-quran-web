@@ -210,18 +210,16 @@ function loadResults(data, animate) {
             .text(row.content[0].text)
             .appendTo(wrapper);
 
-        var ayahControls = $('<div class="controls"></div>');
         var tagGroup = $('<ul></ul>')
-            .appendTo(ayahControls);
+            .appendTo(result);
 
         var audioPlayer = $(
             '<audio controls preload="none">' +
                 '<source src="' + row.audio.mp3.url + '" type="audio/mpeg">' +
                 '<source src="' + row.audio.ogg.url + '" type="audio/ogg">' +
-            '</audio>').appendTo(ayahControls);
+            '</audio>').appendTo(result);
 
-        ayahControls.appendTo(wrapper);
-        $("<div class='clear'>").appendTo(wrapper);
+        $("<div class='clear'>").appendTo(result);
 
         window.lastPlayer;
         audioPlayer.on('play', function () {
@@ -251,11 +249,8 @@ function loadResults(data, animate) {
             tagElement.append(deleteElement);
         });
 
-        var addButton = $('<li class="addTag tag">')
-            .text("+")
-            .attr("surahNum", row.surah)
-            .attr("verseNum", row.verse)
-            .appendTo(tagGroup);
+        result.attr("surahNum", row.surah)
+              .attr("verseNum", row.verse);
     });
 
     if (animate) {
@@ -342,9 +337,12 @@ $(function () {
         return false;
     });
 
-    $("body").on("click", ".addTag", function () {
+    $("body").on("click", ".result", function () {
         context = $(this);
+        var surahNum = context.attr("surahNum");
+        var verseNum = context.attr("verseNum");
         var textBox = $("#addTagDialogTextBox").val("");
+
         $("#addTagPanel").panel('open');
         setTimeout(function () {
             textBox.focus();

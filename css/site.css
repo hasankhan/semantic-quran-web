@@ -1,15 +1,11 @@
-.resultsPane .ui-block-a {
-    width: 88%;
-}
-
-.resultsPane .ui-block-b {
-    width: 12%;
-}
-
-.result .ayahWrapper {
+.result {    
     background-color: beige;
     border: 1px solid black;
     border-top-width: 0;
+    overflow: hidden
+}
+
+.result .ayahWrapper {
     text-align: right;
     padding: 10px;
 }
@@ -19,18 +15,13 @@
 }
 
 .result .ayahRef {
-    font-size: 25px;
-    padding-left: 10px;
+    font-size: 25px;   
     float: left;
 }
 
 .result .translation {
     font-size: 15px;
     padding-top: 5px;
-}
-
-.result .controls {
-    padding-bottom: 30px;
 }
 
 li.tag {
@@ -55,13 +46,13 @@ span.delete {
 }
 
 .resultsPane ul {
-    margin-top: 10px;
     float: right;
 }
 
 audio {
     float: left;
     width: 40px;
+    padding-left: 5px;
 }
 
 #recentlyAddedTags {
