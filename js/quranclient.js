@@ -39,7 +39,7 @@ var QuranClient = (function () {
 
     QuranClient.prototype.login = function (provider) {
         this._onLoading(true);
-        return this.client.login("facebook")
+        return this.client.login(provider)
                           .then(this._onSuccess.bind(this),
                                 this._onError.bind(this));
     };

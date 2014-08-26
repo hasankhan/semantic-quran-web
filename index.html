@@ -1,4 +1,5 @@
 <html>
+
 <head>
     <title>Symantic Quran</title>
     <meta name="viewport" content="initial-scale=0.25">
@@ -16,34 +17,34 @@
         ga('send', 'pageview');
     </script>
 </head>
+
 <body>
-    <div class="header">
-        <h1>Semantic Quran</h1>
-        <h2>Browse and search the Quran based on tags and semantic themes</h2>
-    </div>
-    <div id="contentBody">
-        <div data-role="popup" id="addTagDialog" class="ui-corner-all">
-            <div style="padding:10px 20px;">
-                <h3>Please contribute a thoughtful tag for this ayah.</h3>
-                <input type="text" name="tagName" value="" id="addTagDialogTextBox" placeholder="(ex: Mercy-of-Allah)">
-                <ul id="recentlyAddedTags"></ul>
-                <button id="addTagDialogButton" type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Add</button>
-            </div>
+    <div data-role="page" class="ui-responsive-panel">
+        <div data-role="header" data-theme="f">
+            <h1>Semantic Quran</h1>
+            <h2>Browse and search the Quran based on tags and semantic themes</h2>
+            <a href="javascript:void(0)" id="menuBtn" data-icon="bars"
+               data-iconpos="notext">Menu</a>
+            <!--<a href="javascript:void(0)" data-icon="plus" data-iconpos="notext">Add Tag</a>-->
         </div>
-        <div id="contentArea">
-            <div class="sidePanel ui-grid-c">
-                <div id="browseArea" class="ui-block-a">
+        <div data-role="content">
+            <div class="resultsPane"></div>
+            <button id="loadMore" type="button">Load more</button>
+        </div>
+        <div data-role="panel" data-position="left" data-position-fixed="false" data-display="reveal" id="nav-panel" data-theme="a">
+            <ul data-role="listview" data-theme="a" data-divider-theme="a" style="margin-top:-16px;" class="nav-search">
+                <li data-filtertext="wai-aria voiceover accessibility screen reader">
                     <h3>Browse Ayat</h3>
                     <select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
                         <option value="1">Al-Fatihah</option>
                     </select>
-                </div>
-                <div id="searchArea" class="ui-block-b">
+                </li>
+                <li data-filtertext="wai-aria voiceover accessibility screen reader">
                     <h3>Search Tags</h3>
                     <input type="search" name="search-tag" id="search-tag" value="">
                     <button id="searchButton" type="button">Search</button>
-                </div>
-                <div id="suggestedTags" class="tagGroupHeader ui-block-c">
+                </li>
+                <li data-filtertext="wai-aria voiceover accessibility screen reader">
                     <h3>Suggested Tags</h3>
                     <ul>
                         <li class="tag">
@@ -59,19 +60,35 @@
                             <span class="tagName">hell</span>
                         </li>
                     </ul>
-                </div>
-                <div id="lastUsedTags" class="tagGroupHeader ui-block-d">
+                </li>
+                <li data-filtertext="wai-aria voiceover accessibility screen reader">
                     <h3>Last Used Tags</h3>
-                    <ul></ul>
-                </div>
-            </div>
-            <div class="resultsPane"></div>
-            <button id="loadMore" type="button">Load more</button>
+                    <ul id='lastUsedTags'></ul>
+                </li>
+            </ul>
         </div>
+        <div data-role="panel" data-position="right" data-position-fixed="false" data-display="overlay" id="addTagPanel" data-theme="a">
+            <form class="addTagForm">
+                <h2>Please contribute a thoughtful tag for this ayah.</h2>
+                <label for="tagName">Tag</label>
+                <input type="text" name="tagName" value="" id="addTagDialogTextBox"
+                       data-clear-btn="true" data-mini="true"
+                       placeholder="(ex: heaven)">
+                <ul id="recentlyAddedTags"></ul>
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <a href="javascript:void(0)" data-rel="close" data-role="button" data-theme="c" data-mini="true">Cancel</a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a id="addTagDialogButton" href="javascript:void(0)" data-rel="close" data-role="button" data-theme="b" data-mini="true">Save</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div data-role="footer" data-theme="f"></div>
     </div>
     <!-- Github ribbon -->
     <a id="ribbon" href="https://github.com/hasankhan/semantic-quran-web"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
-
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
@@ -79,6 +96,7 @@
     <script src='http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js'></script>
     <script type="text/javascript" src="js/quranclient.js"></script>
     <script type="text/javascript" src="js/site.js"></script>
-    <button id="login">Login with Facebook</button>
+    <button id="login">Login</button>
 </body>
+
 </html>

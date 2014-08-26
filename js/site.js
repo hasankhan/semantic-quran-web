@@ -9,7 +9,6 @@ $.mobile.linkBindingEnabled = false;
 // Disabling this will prevent jQuery Mobile from handling hash changes
 $.mobile.hashListeningEnabled = false;
 
-
 var Workspace = Backbone.Router.extend({
     routes: {
         "": "home",
@@ -80,7 +79,7 @@ function doDeleteTag(val, surahNum, verseNum) {
 }
 
 function updateMRU() {
-    var container = $('#lastUsedTags ul').empty();
+    var container = $('#lastUsedTags').empty();
     $.each(tagsMRU, function (i, tag) {
         var tagElement = $("<li class='tag'></li>").appendTo(container);
         tagElement.append('<span class="tagName">' + tag + '</span>');
@@ -156,6 +155,12 @@ $(function () {
         }
     });
 
+
+    var navPanel = $('#nav-panel');
+    $('#menuBtn').click(function () {
+        navPanel.panel('toggle');
+    });
+
     $('#loadMore').click(scrollMore);
 
     function scrollMore() {
@@ -204,14 +209,18 @@ function loadResults(data, animate) {
         var translation = $('<div class="translation"></div>')
             .text(row.content[0].text)
             .appendTo(wrapper);
+
+        var ayahControls = $('<div class="controls"></div>');
         var tagGroup = $('<ul></ul>')
-            .appendTo(wrapper);
+            .appendTo(ayahControls);
 
         var audioPlayer = $(
             '<audio controls preload="none">' +
                 '<source src="' + row.audio.mp3.url + '" type="audio/mpeg">' +
                 '<source src="' + row.audio.ogg.url + '" type="audio/ogg">' +
-            '</audio>').appendTo(wrapper);
+            '</audio>').appendTo(ayahControls);
+
+        ayahControls.appendTo(wrapper);
         $("<div class='clear'>").appendTo(wrapper);
 
         window.lastPlayer;
@@ -279,7 +288,7 @@ function onSurahChanged() {
 })();
 
 $(function () {
-    $("#contentBody").on("click", ".tag", function () {
+    $("body").on("click", ".tag", function () {
         var $this = $(this);
 
         if (!$this.hasClass("addTag") && !$this.hasClass("recentTag")) {
@@ -288,7 +297,7 @@ $(function () {
         }
     });
 
-    $("#contentBody").on("click", "span.delete", function () {
+    $("body").on("click", "span.delete", function () {
         var $this = $(this);
         var tag = $this.attr("tag");
         var surah = $this.attr("surah");
@@ -329,14 +338,14 @@ $(function () {
             });
         }
 
-        $("#addTagDialog").popup("close");
+        $("#addTagPanel").panel("close");
         return false;
     });
 
-    $("#contentBody").on("click", ".addTag", function () {
+    $("body").on("click", ".addTag", function () {
         context = $(this);
         var textBox = $("#addTagDialogTextBox").val("");
-        $("#addTagDialog").popup('open');
+        $("#addTagPanel").panel('open');
         setTimeout(function () {
             textBox.focus();
         }, 500);
