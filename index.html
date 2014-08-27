@@ -16,8 +16,34 @@
         ga('create', 'UA-29293370-3', 'auto');
         ga('send', 'pageview');
     </script>
+    <script type="text/template" id="resultTemplate">
+        <% _.each(data, function(row){ %>
+        <div class="result">
+            <div class="ayahWrapper">
+                <div class="ayahRef">[<%=row.surah%>:<%=row.verse%>]</div>
+                <div class="ayah"><%=row.quran.text%></div>
+                <div class="translation"><%=row.content[0].text%></div>
+            </div>
+            <ul id="tags<%=row.surah%>_<%=row.verse%>">
+                <% _.each(row.tags, function(tag){ %>
+                <li class='tag'>
+                    <span class="tagName"><%=tag%></span>
+                    <span class="delete" tag="<%=tag%>" surah="<%=row.surah%>" verse="<%=row.verse%>">X</span>
+                </li>
+                <% }); %>
+                <li class="addTag">
+                    <a href="javascript:void(0)" data-icon="tag" data-iconpos="notext" data-role="button">Add Tag</a>
+                </li>
+            </ul>
+            <audio controls preload="none" onplay="pausePreviousAudio(event)">
+                <source src="<%=row.audio.mp3.url%>" type="audio/mpeg">
+                <source src="<%=row.audio.ogg.url%>" type="audio/ogg">
+            </audio>
+            <div class='clear'></div>
+        </div>
+        <% }); %>
+    </script>
 </head>
-
 <body>
     <div data-role="page">
         <div data-role="header" data-theme="b" data-position="fixed">
@@ -27,7 +53,8 @@
             <a href="javascript:void(0)" id="login" data-icon="user" data-iconpos="notext">Login</a>
         </div>
         <div data-role="content">
-            <div class="resultsPane"></div>
+            <div class="resultsPane">
+            </div>
             <button id="loadMore" type="button">Load more</button>
         </div>
         <div data-role="panel" data-position="left" data-position-fixed="true" data-display="reveal" id="nav-panel">

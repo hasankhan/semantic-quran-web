@@ -13,23 +13,14 @@ var Workspace = Backbone.Router.extend({
     routes: {
         "": "home",
         "search/:tag": "search",
-        ":surah/:start-:end": "view",
-        ":surah/:start": "view",
-        ":surah": "view"
+        ":surah/:start-:end": "viewPassage",
+        ":surah/:start": "viewPassage",
+        ":surah": "viewPassage"
     },
 
-    home: function () {
-        doViewPassage(1);
-    },
-
-    view: function (surah, start, end) {
-        doViewPassage(surah, start, end);
-    },
-
-    search: function (tag) {
-        onSearch(tag);
-    }
-
+    home: doViewPassage.bind(this, 1),
+    viewPassage: doViewPassage.bind(this),
+    search: doSearch.bind(this)
 });
 
 var router = new Workspace();
@@ -102,11 +93,12 @@ function updateRecentlyAddedTags() {
     }
 }
 
-function doSearch(tag) {
-    router.navigate('search/' + tag, { trigger: true });
+function onSearch(tag) {
+    router.navigate('search/' + tag, { trigger: false });
+    doSearch(tag);
 }
 
-function onSearch(val) {
+function doSearch(val) {
     window.lastSurah = null;
     window.enableAutoScroll = false;
     $('#loadMore').hide();
@@ -190,72 +182,27 @@ function loadVerses(surah, start, end, animate) {
                 });
 }
 
-function loadResults(data, animate) {
-    $.each(data, function (i, row) {
-        var resultPane = $('.resultsPane');
-        var result = $('<div class="result">');
-        if (animate) {
-            result.fadeIn("slow")
+var resultUI, resultPane;
+$(function () {
+    resultUI = _.template($("#resultTemplate").html());
+    resultPane = $('.resultsPane');
+});
+
+var lastPlayer;
+function pausePreviousAudio(e) {
+    var self = e.target;
+    if (lastPlayer) {
+        if (lastPlayer.pause) {
+            lastPlayer.pause();
         }
-        result.appendTo(resultPane);
-        var wrapper = $('<div class="ayahWrapper">')
-            .appendTo(result);
-        var ayahRef = $('<div class="ayahRef"></div>')
-            .text('[' + row.surah + ':' + row.verse + ']')
-            .appendTo(wrapper);
-        var ayah = $('<div class="ayah"></div>')
-            .text(row.quran.text)
-            .appendTo(wrapper);
-        var translation = $('<div class="translation"></div>')
-            .text(row.content[0].text)
-            .appendTo(wrapper);
+        $(lastPlayer).css('width', '40px');
+    }
+    $(self).css('width', '200px');
+    lastPlayer = self;
+}
 
-        var tagGroup = $('<ul id="tags' + row.surah + '_' + row.verse + '"></ul>')
-            .appendTo(result);
-
-        var audioPlayer = $(
-            '<audio controls preload="none">' +
-                '<source src="' + row.audio.mp3.url + '" type="audio/mpeg">' +
-                '<source src="' + row.audio.ogg.url + '" type="audio/ogg">' +
-            '</audio>').appendTo(result);
-
-        $("<div class='clear'>").appendTo(result);
-
-        window.lastPlayer;
-        audioPlayer.on('play', function () {
-            if (window.lastPlayer) {
-                if (window.lastPlayer.pause) {
-                    window.lastPlayer.pause();
-                }
-                if (window.lastPlayer[0] && window.lastPlayer[0].pause) {
-                    window.lastPlayer[0].pause();
-                }
-                window.lastPlayer.css('width', '40px');
-            }
-            window.lastPlayer = $(this)
-            window.lastPlayer.css('width', '200px');
-        });
-
-        // Add all the tags to the row
-        $.each(row.tags, function (j, tag) {
-            var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
-            tagElement.append('<span class="tagName">' + tag + '</span>');
-
-            var deleteElement = $('<span class="delete">x</span>')
-                .attr("tag", tag)
-                .attr("surah", row.surah)
-                .attr("verse", row.verse);
-
-            tagElement.append(deleteElement);
-        });
-
-        var addButton = $('<li class="addTag"><a href="javascript:void(0)" data-icon="tag" data-iconpos="notext" data-role="button">Add Tag</a></li>');
-        tagGroup.append(tagGroup);
-
-        result.attr("surahNum", row.surah)
-              .attr("verseNum", row.verse);
-    });
-
+function loadResults(data, animate) {
+    resultPane.html(resultUI({ data: data }));
     if (animate) {
         window.scroll(0, 0);
     }
@@ -291,7 +238,7 @@ $(function () {
 
         if (!$this.hasClass("addTag") && !$this.hasClass("recentTag")) {
             var val = $(".tagName", $this).text();
-            doSearch(val);
+            onSearch(val);
         }
     });
 
@@ -368,7 +315,7 @@ $(function () {
         var val = $("#search-tag").val();
 
         if (val && val.length > 0) {
-            doSearch(val);
+            onSearch(val);
         }
     });
 
@@ -386,7 +333,7 @@ $(function () {
 $(function () {
     var loginBtn = $("#login");
     loginBtn.click(function () {
-        client.login('facebook').done(function (results) {
+        client.login('google').done(function (results) {
             loginBtn.hide();
         }, function (err) {
             alert("Error: " + err);
