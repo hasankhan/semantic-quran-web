@@ -331,7 +331,7 @@ $(function () {
 $(function () {
     var loginBtn = $("#login");
     loginBtn.click(function () {
-        client.login('google').done(function (results) {
+        client.login('facebook').done(function (results) {
             loginBtn.hide();
         }, function (err) {
             alert("Error: " + err);

@@ -49,7 +49,6 @@
         <div data-role="header" data-theme="b" data-position="fixed">
             <a href="javascript:void(0)" id="menuBtn" data-icon="bars" data-iconpos="notext">Menu</a>
             <h1>Semantic Quran</h1>
-            <h2>Browse and search the Quran based on tags and semantic themes</h2>
             <a href="javascript:void(0)" id="login" data-icon="user" data-iconpos="notext">Login</a>
         </div>
         <div data-role="content">
@@ -57,17 +56,18 @@
             </div>
             <button id="loadMore" type="button">Load more</button>
         </div>
-        <div data-role="footer" data-theme="b">
-            <a href="https://github.com/hasankhan/semantic-quran-web" data-role="button" data-mini="true">View source</a>
+        <div data-role="footer" data-theme="b" data-position="fixed">
+            <select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
+                <option value="1">Al-Fatihah</option>
+            </select>
+            <a class="ui-btn-right" data-iconpos="notext"
+               data-icon="info" target="_blank"
+               href="https://github.com/hasankhan/semantic-quran-web">
+                View source
+            </a>
         </div>
         <div data-role="panel" data-position="left" data-position-fixed="true" data-display="reveal" id="nav-panel">
             <ul data-role="listview" style="margin-top:-16px;" class="nav-search">
-                <li data-filtertext="wai-aria">
-                    <h3>Browse Ayat</h3>
-                    <select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
-                        <option value="1">Al-Fatihah</option>
-                    </select>
-                </li>
                 <li data-filtertext="wai-aria">
                     <h3>Search Tags</h3>
                     <input type="search" name="search-tag" id="search-tag" value="">
