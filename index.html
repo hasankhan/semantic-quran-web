@@ -31,8 +31,8 @@
                     <span class="delete" tag="<%=tag%>" surah="<%=row.surah%>" verse="<%=row.verse%>">X</span>
                 </li>
                 <% }); %>
-                <li class="addTag">
-                    <a href="javascript:void(0)" data-icon="tag" data-iconpos="notext" data-role="button">Add Tag</a>
+                <li class='tag addTag' data-surah="<%=row.surah%>" data-verse="<%=row.verse%>">
+                    Add tag
                 </li>
             </ul>
             <audio controls preload="none" onplay="pausePreviousAudio(event)">
@@ -56,6 +56,9 @@
             <div class="resultsPane">
             </div>
             <button id="loadMore" type="button">Load more</button>
+        </div>
+        <div data-role="footer" data-theme="b">
+            <a href="https://github.com/hasankhan/semantic-quran-web" data-role="button" data-mini="true">View source</a>
         </div>
         <div data-role="panel" data-position="left" data-position-fixed="true" data-display="reveal" id="nav-panel">
             <ul data-role="listview" style="margin-top:-16px;" class="nav-search">
@@ -94,7 +97,7 @@
             </ul>
         </div>
         <div data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay" id="addTagPanel" data-theme="a">
-            <form class="addTagForm">
+            <form id="addTagForm">
                 <h3>Please contribute a thoughtful tag for this ayah.</h3>
                 <label for="tagName">Tag</label>
                 <input type="text" name="tagName" value="" id="addTagDialogTextBox"
@@ -106,9 +109,6 @@
                     <a id="addTagDialogButton" data-rel="close" data-theme="b" data-role="button" data-mini="true" data-inline="true">Save</a>
                 </div>
             </form>
-        </div>
-        <div data-role="footer" data-theme="b">
-            <a href="https://github.com/hasankhan/semantic-quran-web" data-role="button" data-mini="true">View source</a>
         </div>
     </div>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>

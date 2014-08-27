@@ -27,16 +27,7 @@ var router = new Workspace();
 Backbone.history.start();
 
 client.onLoading = function (loading) {
-    if (loading) {
-        $.mobile.loading('show', {
-            theme: $.mobile.loader.prototype.options.theme,
-            msgText: 'Loading',
-            textVisible: true
-        });
-    }
-    else {
-        $.mobile.loading('hide');
-    }
+    $.mobile.loading(loading ? 'show' : 'hide');
 };
 
 function doAddTag(val, surahNum, verseNum) {
@@ -147,7 +138,6 @@ $(function () {
         }
     });
 
-
     var navPanel = $('#nav-panel');
     $('#menuBtn').click(function () {
         navPanel.panel('toggle');
@@ -155,16 +145,21 @@ $(function () {
 
     $('#loadMore').click(scrollMore);
 
-    function scrollMore() {
-        if (!window.enableAutoScroll) {
-            return;
-        }
-
-        window.ayahStart += 50;
-        window.ayahEnd += 50;
-        loadVerses(window.surah, window.ayahStart, window.ayahEnd, false);
-    }
+    $('#addTagForm').submit(function () {
+        $('#addTagDialogButton').click();
+        return false;
+    });
 });
+
+function scrollMore() {
+    if (!window.enableAutoScroll) {
+        return;
+    }
+
+    window.ayahStart += 50;
+    window.ayahEnd += 50;
+    loadVerses(window.surah, window.ayahStart, window.ayahEnd, false);
+}
 
 function loadVerses(surah, start, end, animate) {
     window.loading = true;
@@ -254,10 +249,11 @@ $(function () {
     });
 
     $("#addTagDialogButton").click(function () {
+        var data = $('#addTagForm').data();
         var $textBox = $("#addTagDialogTextBox");
         var tags = $textBox.val();
-        var surahNum = context.attr("surahNum");
-        var verseNum = context.attr("verseNum");
+        var surahNum = data.surah;
+        var verseNum = data.verse;
 
         $textBox.val('');
 
@@ -288,10 +284,12 @@ $(function () {
     });
 
     $("body").on("click", ".addTag", function (event) {
+        var data = $(this).data();
 
-        context = $(this);
-        var surahNum = context.attr("surahNum");
-        var verseNum = context.attr("verseNum");
+        var form = $('#addTagForm');
+        form.data('surah', data.surah);
+        form.data('verse', data.verse);
+
         var textBox = $("#addTagDialogTextBox").val("");
 
         $("#addTagPanel").panel('open');
