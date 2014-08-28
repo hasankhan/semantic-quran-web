@@ -177,9 +177,13 @@ function loadVerses(surah, start, end, animate) {
                 });
 }
 
-var resultUI, resultPane;
+var resultTemplate,
+    tagTemplate,
+    resultPane;
+
 $(function () {
-    resultUI = _.template($("#resultTemplate").html());
+    resultTemplate = _.template($("#result_template").html());
+    tagTemplate = _.template($("#tag_template").html());
     resultPane = $('.resultsPane');
 });
 
@@ -197,7 +201,11 @@ function pausePreviousAudio(e) {
 }
 
 function loadResults(data, animate) {
-    resultPane.html(resultUI({ data: data }));
+    resultPane.html(resultTemplate({
+        data: data,
+        tagTemplate: tagTemplate
+    }));
+
     if (animate) {
         window.scroll(0, 0);
     }
@@ -266,15 +274,12 @@ $(function () {
 
                     // Update the local row
                     var tagGroup = $('#tags' + surahNum + '_' + verseNum);
-                    var tagElement = $("<li class='tag'></li>").prependTo(tagGroup);
-                    tagElement.append('<span class="tagName">' + val.text + '</span>');
-
-                    var deleteElement = $('<span class="delete">x</span>')
-                        .attr("tag", val.text)
-                        .attr("surah", surahNum)
-                        .attr("verse", verseNum);
-
-                    tagElement.append(deleteElement);
+                    var newTag = tagTemplate({
+                        tag: val.text,
+                        surah: surahNum,
+                        verse: verseNum
+                    });
+                    tagGroup.prepend(newTag);
                 });
             });
         }
