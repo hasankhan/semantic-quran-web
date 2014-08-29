@@ -324,6 +324,7 @@ function loadResults(data, animate) {
     }
 }
 
+
 var lastSurah = null;
 function onSurahChanged() {
     var surah = $("#surahSelect").val();
@@ -331,5 +332,6 @@ function onSurahChanged() {
         return;
     }
     lastSurah = surah;
-    router.navigate(surah, { trigger: true });
+    router.navigate(surah, { trigger: false });
+    doViewPassage(surah);
 }
