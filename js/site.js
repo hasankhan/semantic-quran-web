@@ -6,7 +6,9 @@ var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHb
     verseTagTemplate,
     resultPane,
     router,
-    mainView;
+    mainView,
+    currentSurah,
+    surahList = [];
 
 // Prevents all anchor click handling
 $.mobile.linkBindingEnabled = false;
@@ -59,8 +61,6 @@ $(function () {
             scrollMore();
         }
     });
-
-    $('#loadMore').click(scrollMore);
 
     $('#addTagForm').submit(function () {
         $('#addTagDialogButton').click();
@@ -173,15 +173,12 @@ $(function () {
     }
 
     var surahSelector = $("#surahSelect");
+    surahListTemplate = _.template($('#surah_list_template').html());
     surahSelector.click(onSurahChanged);
     client.listSurahs()
             .done(function (req) {
-                if (req.result && req.result.length > 0) {
-                    surahSelector.empty();
-                    req.result.forEach(function (surahData, i) {
-                        var surahEntry = $('<option value="' + surahData.id + '">' + surahData.id + ': ' + surahData.name.simple + '</option>').appendTo(surahSelector);
-                    });
-                }
+                surahList = req.result || [];
+                surahSelector.html(surahListTemplate({ surahs: surahList }));                
             });
 });
 
@@ -247,9 +244,8 @@ function onSearch(tag) {
 }
 
 function doSearch(val) {
-    window.lastSurah = null;
+    currentSurah = 0;
     window.enableAutoScroll = false;
-    $('#loadMore').hide();
 
     console.log("Doing search for: " + val);
     var resultPane = $('.resultsPane').empty();
@@ -278,38 +274,38 @@ function doSearch(val) {
 }
 
 function doViewPassage(surah, ayahStart, ayahEnd) {
+    if (surahList.length > 0 && surah >= surahList.length) {
+        return;
+    }
+
+    currentSurah = surah;
     window.enableAutoScroll = true;
 
     var resultPane = $('.resultsPane').empty();
     loadVerses(surah, ayahStart, ayahEnd, true);
 
-    window.surah = surah;
     window.ayahStart = ayahStart || 1;
     window.ayahEnd = ayahEnd || 50;
 }
 
 function scrollMore() {
-    if (!window.enableAutoScroll) {
+    if (!window.enableAutoScroll ||
+        currentSurah == 0 ||
+        (surahList.length > 0 && window.ayahEnd >= surahList[currentSurah - 1].verses)) {
         return;
     }
 
     window.ayahStart += 50;
-    window.ayahEnd += 50;
-    loadVerses(window.surah, window.ayahStart, window.ayahEnd, false);
+    window.ayahEnd = Math.min(window.ayahEnd + 50, surahList[currentSurah - 1].verses);
+    loadVerses(currentSurah, window.ayahStart, window.ayahEnd, false);
 }
 
 function loadVerses(surah, start, end, animate) {
     window.loading = true;
     client.getVersesByRange(surah, start, end)
                 .done(function (req) {
-                    if (req.result && req.result.length > 0) {
-                        loadResults(req.result, animate);
-                        if (req.result.length < 50) {
-                            $('#loadMore').hide();
-                        }
-                        else {
-                            $('#loadMore').show();
-                        }
+                    if (req.result) {
+                        loadResults(req.result, animate);                        
                     }
                 });
 }
@@ -338,14 +334,12 @@ function loadResults(data, animate) {
     }
 }
 
-
-var lastSurah = null;
 function onSurahChanged() {
     var surah = $("#surahSelect").val();
-    if (surah == lastSurah) {
+    if (currentSurah == surah) {
         return;
     }
-    lastSurah = surah;
+
     router.navigate(surah, { trigger: false });
     doViewPassage(surah);
 }

@@ -27,7 +27,6 @@
         <div data-role="content">
             <div class="resultsPane">
             </div>
-            <button id="loadMore" type="button">Load more</button>
         </div>
         <div data-role="footer" data-theme="b" data-position="fixed">
             <select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
@@ -91,43 +90,48 @@
     <script src='http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js'></script>
     <script type="text/javascript" src="js/quranclient.js"></script>
     <script type="text/javascript" src="js/site.js"></script>
+    <script type="text/template" id="surah_list_template">
+        <% surahs.forEach(function(surah) { %>
+        <option value="<%= surah.id %>"><%= surah.id %>: <%= surah.name.simple %></option>
+        <% }); %>
+    </script>
     <script type="text/template" id="tag_list_template">
         <% tags.forEach(function(tag) { %>
-        <li class="tag <%=classes%>">
-            <span class=" tagname"><%=tag%></span>
+        <li class="tag <%= classes %>">
+            <span class=" tagname"><%= tag %></span>
         </li>
         <% }); %>
     </script>
     <script type="text/template" id="verse_tag_template">
         <li class='tag'>
-            <span class="tagName"><%=tag%></span>
-            <span class="delete" data-tag="<%=tag%>" data-surah="<%=surah%>" data-verse="<%=verse%>">X</span>
+            <span class="tagName"><%= tag %></span>
+            <span class="delete" data-tag="<%= tag %>" data-surah="<%= surah %>" data-verse="<%= verse %>">X</span>
         </li>
     </script>
     <script type="text/template" id="result_template">
         <% data.forEach(function(row){ %>
         <div class="result">
             <div class="ayahWrapper">
-                <div class="ayahRef">[<%=row.surah%>:<%=row.verse%>]</div>
-                <div class="ayah"><%=row.quran.text%></div>
-                <div class="translation"><%=row.content[0].text%></div>
+                <div class="ayahRef">[<%= row.surah %>:<%= row.verse %>]</div>
+                <div class="ayah"><%= row.quran.text %></div>
+                <div class="translation"><%= row.content[0].text %></div>
             </div>
-            <ul id="tags<%=row.surah%>_<%=row.verse%>">
+            <ul id="tags<%= row.surah %>_<%= row.verse %>">
                 <% row.tags.forEach(function(tag){
-                print(tagTemplate({
-                tag: tag,
-                surah: row.surah,
-                verse: row.verse
-                }));
-                });
+                    print(tagTemplate({
+                        tag: tag,
+                        surah: row.surah,
+                        verse: row.verse
+                        }));
+                    });
                 %>
-                <li class='tag addTag' data-surah="<%=row.surah%>" data-verse="<%=row.verse%>">
+                <li class='tag addTag' data-surah="<%= row.surah %>" data-verse="<%= row.verse %>">
                     Add tag
                 </li>
             </ul>
             <audio controls preload="none" onplay="pausePreviousAudio(event)">
-                <source src="<%=row.audio.mp3.url%>" type="audio/mpeg">
-                <source src="<%=row.audio.ogg.url%>" type="audio/ogg">
+                <source src="<%= row.audio.mp3.url %>" type="audio/mpeg">
+                <source src="<%= row.audio.ogg.url %>" type="audio/ogg">
             </audio>
             <div class='clear'></div>
         </div>
