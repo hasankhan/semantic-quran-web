@@ -23,8 +23,155 @@ var Workspace = Backbone.Router.extend({
     search: doSearch.bind(this)
 });
 
-var router = new Workspace();
-Backbone.history.start();
+var resultTemplate,
+    tagTemplate,
+    resultPane,
+    router;
+
+$(function () {
+    resultTemplate = _.template($("#result_template").html());
+    tagTemplate = _.template($("#tag_template").html());
+    resultPane = $('.resultsPane');
+    router = new Workspace();
+    Backbone.history.start();
+
+    $(window).scroll(function () {
+        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+            scrollMore();
+        }
+    });
+
+    var navPanel = $('#nav-panel');
+    $('#menuBtn').click(function () {
+        navPanel.panel('toggle');
+    });
+
+    $('#loadMore').click(scrollMore);
+
+    $('#addTagForm').submit(function () {
+        $('#addTagDialogButton').click();
+        return false;
+    });
+
+    var loginBtn = $("#login");
+    loginBtn.click(function () {
+        client.login('facebook').done(function (results) {
+            loginBtn.hide();
+        }, function (err) {
+            alert("Error: " + err);
+        });
+    });
+
+    var $body = $("body");
+    $body.on("click", ".tag", function () {
+        var $this = $(this);
+
+        if (!$this.hasClass("addTag") && !$this.hasClass("recentTag")) {
+            var val = $(".tagName", $this).text();
+            onSearch(val);
+        }
+    });
+
+    $body.on("click", "span.delete", function () {
+        var $this = $(this);
+        var tag = $this.attr("tag");
+        var surah = $this.attr("surah");
+        var verse = $this.attr("verse");
+        var parent = $this.parent().remove();
+        doDeleteTag(tag, surah, verse);
+
+        return false;
+    });
+
+    $("#addTagDialogButton").click(function () {
+        var data = $('#addTagForm').data();
+        var $textBox = $("#addTagDialogTextBox");
+        var tags = $textBox.val();
+        var surahNum = data.surah;
+        var verseNum = data.verse;
+
+        $textBox.val('');
+
+        if (tags != null && tags.length > 0) {
+            var values = tags.split(/[,;]/);
+            $.each(values, function (i, value) {
+                doAddTag(value, surahNum, verseNum).done(function (req) {
+                    var val = req.result;
+                    console.log("Successfully Added: " + val.text);
+
+                    // Update the local row
+                    var tagGroup = $('#tags' + surahNum + '_' + verseNum);
+                    var newTag = tagTemplate({
+                        tag: val.text,
+                        surah: surahNum,
+                        verse: verseNum
+                    });
+                    tagGroup.prepend(newTag);
+                });
+            });
+        }
+
+        $("#addTagPanel").panel("close");
+        return false;
+    });
+
+    $body.on("click", ".addTag", function (event) {
+        var data = $(this).data();
+
+        var form = $('#addTagForm');
+        form.data('surah', data.surah);
+        form.data('verse', data.verse);
+
+        var textBox = $("#addTagDialogTextBox").val("");
+
+        $("#addTagPanel").panel('open');
+        setTimeout(function () {
+            textBox.focus();
+        }, 500);
+    });
+
+    $("#recentlyAddedTags").on("click", ".recentTag", function () {
+        var $this = $(this);
+        var $textBox = $("#addTagDialogTextBox");
+        var val = $(".tagName", $this).text();
+        var existing = $textBox.val();
+        if (existing) {
+            val = existing + ',' + val;
+        }
+        $textBox.val(val);
+    });
+
+    $("#searchButton").click(function () {
+        var val = $("#search-tag").val();
+
+        if (val && val.length > 0) {
+            onSearch(val);
+        }
+    });
+
+    if (typeof (Storage) !== "undefined") {
+        if (localStorage.tagsMRU) {
+            tagsMRU = JSON.parse(localStorage.tagsMRU);
+            updateMRU();
+        }
+        if (localStorage.tagsRecentlyAdded) {
+            tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
+            updateRecentlyAddedTags();
+        }
+    }
+
+    var surahSelector = $("#surahSelect");
+    surahSelector.click(onSurahChanged);
+    client.listSurahs()
+            .done(function (req) {
+                if (req.result && req.result.length > 0) {
+                    surahSelector.empty();
+                    req.result.forEach(function (surahData, i) {
+                        var surahEntry = $('<option value="' + surahData.id + '">' + surahData.id + ': ' + surahData.name.simple + '</option>').appendTo(surahSelector);
+                    });
+                }
+            });
+});
 
 client.onLoading = function (loading) {
     $.mobile.loading(loading ? 'show' : 'hide');
@@ -97,7 +244,7 @@ function doSearch(val) {
     console.log("Doing search for: " + val);
     var resultPane = $('.resultsPane').empty();
 
-    this.client.findVersesByTag(val)
+    client.findVersesByTag(val)
                 .done(function (req) {
                     if (req.result && req.result.length > 0) {
                         loadResults(req.result, true);
@@ -131,26 +278,6 @@ function doViewPassage(surah, ayahStart, ayahEnd) {
     window.ayahEnd = ayahEnd || 50;
 }
 
-$(function () {
-    $(window).scroll(function () {
-        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
-            scrollMore();
-        }
-    });
-
-    var navPanel = $('#nav-panel');
-    $('#menuBtn').click(function () {
-        navPanel.panel('toggle');
-    });
-
-    $('#loadMore').click(scrollMore);
-
-    $('#addTagForm').submit(function () {
-        $('#addTagDialogButton').click();
-        return false;
-    });
-});
-
 function scrollMore() {
     if (!window.enableAutoScroll) {
         return;
@@ -163,7 +290,7 @@ function scrollMore() {
 
 function loadVerses(surah, start, end, animate) {
     window.loading = true;
-    this.client.getVersesByRange(surah, start, end)
+    client.getVersesByRange(surah, start, end)
                 .done(function (req) {
                     if (req.result && req.result.length > 0) {
                         loadResults(req.result, animate);
@@ -176,16 +303,6 @@ function loadVerses(surah, start, end, animate) {
                     }
                 });
 }
-
-var resultTemplate,
-    tagTemplate,
-    resultPane;
-
-$(function () {
-    resultTemplate = _.template($("#result_template").html());
-    tagTemplate = _.template($("#tag_template").html());
-    resultPane = $('.resultsPane');
-});
 
 var lastPlayer;
 function pausePreviousAudio(e) {
@@ -211,135 +328,12 @@ function loadResults(data, animate) {
     }
 }
 
-window.lastSurah = null;
+var lastSurah = null;
 function onSurahChanged() {
     var surah = $("#surahSelect").val();
-    if (surah == window.lastSurah) {
+    if (surah == lastSurah) {
         return;
     }
-    window.lastSurah = surah;
+    lastSurah = surah;
     router.navigate(surah, { trigger: true });
 }
-
-(function initializeSurahDropdowns() {
-    var surahSelector = $("#surahSelect");
-    surahSelector.click(onSurahChanged);
-    this.client.listSurahs()
-                .done(function (req) {
-                    if (req.result && req.result.length > 0) {
-                        surahSelector.empty();
-                        req.result.forEach(function (surahData, i) {
-                            var surahEntry = $('<option value="' + surahData.id + '">' + surahData.id + ': ' + surahData.name.simple + '</option>').appendTo(surahSelector);
-                        });
-                    }
-                });
-})();
-
-$(function () {
-    $("body").on("click", ".tag", function () {
-        var $this = $(this);
-
-        if (!$this.hasClass("addTag") && !$this.hasClass("recentTag")) {
-            var val = $(".tagName", $this).text();
-            onSearch(val);
-        }
-    });
-
-    $("body").on("click", "span.delete", function () {
-        var $this = $(this);
-        var tag = $this.attr("tag");
-        var surah = $this.attr("surah");
-        var verse = $this.attr("verse");
-        var parent = $this.parent().remove();
-        doDeleteTag(tag, surah, verse);
-
-        return false;
-    });
-
-    $("#addTagDialogButton").click(function () {
-        var data = $('#addTagForm').data();
-        var $textBox = $("#addTagDialogTextBox");
-        var tags = $textBox.val();
-        var surahNum = data.surah;
-        var verseNum = data.verse;
-
-        $textBox.val('');
-
-        if (tags != null && tags.length > 0) {
-            var values = tags.split(/[,;]/);
-            $.each(values, function (i, value) {
-                doAddTag(value, surahNum, verseNum).done(function (req) {
-                    var val = req.result;
-                    console.log("Successfully Added: " + val.text);
-
-                    // Update the local row
-                    var tagGroup = $('#tags' + surahNum + '_' + verseNum);
-                    var newTag = tagTemplate({
-                        tag: val.text,
-                        surah: surahNum,
-                        verse: verseNum
-                    });
-                    tagGroup.prepend(newTag);
-                });
-            });
-        }
-
-        $("#addTagPanel").panel("close");
-        return false;
-    });
-
-    $("body").on("click", ".addTag", function (event) {
-        var data = $(this).data();
-
-        var form = $('#addTagForm');
-        form.data('surah', data.surah);
-        form.data('verse', data.verse);
-
-        var textBox = $("#addTagDialogTextBox").val("");
-
-        $("#addTagPanel").panel('open');
-        setTimeout(function () {
-            textBox.focus();
-        }, 500);
-    });
-
-    $("#recentlyAddedTags").on("click", ".recentTag", function () {
-        var $this = $(this);
-        var $textBox = $("#addTagDialogTextBox");
-        var val = $(".tagName", $this).text();
-        var existing = $textBox.val();
-        if (existing) {
-            val = existing + ',' + val;
-        }
-        $textBox.val(val);
-    });
-
-    $("#searchButton").click(function () {
-        var val = $("#search-tag").val();
-
-        if (val && val.length > 0) {
-            onSearch(val);
-        }
-    });
-
-    if (typeof (Storage) !== "undefined") {
-        if (localStorage.tagsMRU) {
-            tagsMRU = JSON.parse(localStorage.tagsMRU);
-            updateMRU();
-        }
-        if (localStorage.tagsRecentlyAdded) {
-            tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
-            updateRecentlyAddedTags();
-        }
-    }
-});
-$(function () {
-    var loginBtn = $("#login");
-    loginBtn.click(function () {
-        client.login('facebook').done(function (results) {
-            loginBtn.hide();
-        }, function (err) {
-            alert("Error: " + err);
-        });
-    });
-});
