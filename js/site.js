@@ -1,7 +1,11 @@
 var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHbuHsfhRmylXmwQgOKAsnmUyKG49'),
     tagsMRU = [],
     tagsRecentlyAdded = [],
-    context = null;
+    resultTemplate,
+    tagListTemplate,
+    verseTagTemplate,
+    resultPane,
+    router;
 
 // Prevents all anchor click handling
 $.mobile.linkBindingEnabled = false;
@@ -23,14 +27,10 @@ var Workspace = Backbone.Router.extend({
     search: doSearch.bind(this)
 });
 
-var resultTemplate,
-    tagTemplate,
-    resultPane,
-    router;
-
 $(function () {
     resultTemplate = _.template($("#result_template").html());
-    tagTemplate = _.template($("#tag_template").html());
+    verseTagTemplate = _.template($("#verse_tag_template").html());
+    tagListTemplate = _.template($("#tag_list_template").html());
     resultPane = $('.resultsPane');
     router = new Workspace();
     Backbone.history.start();
@@ -74,11 +74,9 @@ $(function () {
 
     $body.on("click", "span.delete", function () {
         var $this = $(this);
-        var tag = $this.attr("tag");
-        var surah = $this.attr("surah");
-        var verse = $this.attr("verse");
+        var data = $this.data();
         var parent = $this.parent().remove();
-        doDeleteTag(tag, surah, verse);
+        doDeleteTag(data.tag, data.surah, data.verse);
 
         return false;
     });
@@ -101,7 +99,7 @@ $(function () {
 
                     // Update the local row
                     var tagGroup = $('#tags' + surahNum + '_' + verseNum);
-                    var newTag = tagTemplate({
+                    var newTag = verseTagTemplate({
                         tag: val.text,
                         surah: surahNum,
                         verse: verseNum
@@ -208,11 +206,10 @@ function doDeleteTag(val, surahNum, verseNum) {
 }
 
 function updateMRU() {
-    var container = $('#lastUsedTags').empty();
-    $.each(tagsMRU, function (i, tag) {
-        var tagElement = $("<li class='tag'></li>").appendTo(container);
-        tagElement.append('<span class="tagName">' + tag + '</span>');
-    });
+    var container = $('#lastUsedTags').html(tagListTemplate({
+        tags: tagsMRU,
+        classes: ''
+    }));
 
     if (typeof (Storage) !== "undefined") {
         localStorage.tagsMRU = JSON.stringify(tagsMRU);
@@ -220,11 +217,10 @@ function updateMRU() {
 }
 
 function updateRecentlyAddedTags() {
-    var container = $('#recentlyAddedTags').empty();
-    $.each(tagsRecentlyAdded, function (i, tag) {
-        var tagElement = $("<li class='tag recentTag'></li>").appendTo(container);
-        tagElement.append('<span class="tagName">' + tag + '</span>');
-    });
+    var container = $('#recentlyAddedTags').html(tagListTemplate({
+        tags: tagsRecentlyAdded,
+        classes: 'recentTag'
+    }));    
 
     if (typeof (Storage) !== "undefined") {
         localStorage.tagsRecentlyAdded = JSON.stringify(tagsRecentlyAdded);
@@ -320,7 +316,7 @@ function pausePreviousAudio(e) {
 function loadResults(data, animate) {
     resultPane.html(resultTemplate({
         data: data,
-        tagTemplate: tagTemplate
+        tagTemplate: verseTagTemplate
     }));
 
     if (animate) {
