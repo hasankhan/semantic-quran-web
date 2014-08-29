@@ -5,7 +5,8 @@ var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHb
     tagListTemplate,
     verseTagTemplate,
     resultPane,
-    router;
+    router,
+    mainView;
 
 // Prevents all anchor click handling
 $.mobile.linkBindingEnabled = false;
@@ -27,11 +28,29 @@ var Workspace = Backbone.Router.extend({
     search: doSearch.bind(this)
 });
 
+var MainView = Backbone.View.extend({
+    el: $("#mainPage"),
+
+    events: {
+        "click #menuBtn": "toggleMenu"
+    },
+
+    initialize: function () {
+        this.navPanel = $('#nav-panel');
+    },
+
+    toggleMenu: function () {
+        this.navPanel.panel('toggle');
+    }
+});
+
 $(function () {
     resultTemplate = _.template($("#result_template").html());
     verseTagTemplate = _.template($("#verse_tag_template").html());
     tagListTemplate = _.template($("#tag_list_template").html());
     resultPane = $('.resultsPane');
+
+    mainView = new MainView();
     router = new Workspace();
     Backbone.history.start();
 
@@ -39,11 +58,6 @@ $(function () {
         if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
             scrollMore();
         }
-    });
-
-    var navPanel = $('#nav-panel');
-    $('#menuBtn').click(function () {
-        navPanel.panel('toggle');
     });
 
     $('#loadMore').click(scrollMore);
@@ -199,10 +213,10 @@ function doAddTag(val, surahNum, verseNum) {
 function doDeleteTag(val, surahNum, verseNum) {
     console.log("Deleting tag: " + val + " to " + "[" + surahNum + ":" + verseNum + "]");
 
-    this.client.removeTag(surahNum, verseNum, val)
-                .done(function () {
-                    console.log("Successfully Deleted")
-                });
+    client.removeTag(surahNum, verseNum, val)
+            .done(function () {
+                console.log("Successfully Deleted")
+            });
 }
 
 function updateMRU() {
@@ -220,7 +234,7 @@ function updateRecentlyAddedTags() {
     var container = $('#recentlyAddedTags').html(tagListTemplate({
         tags: tagsRecentlyAdded,
         classes: 'recentTag'
-    }));    
+    }));
 
     if (typeof (Storage) !== "undefined") {
         localStorage.tagsRecentlyAdded = JSON.stringify(tagsRecentlyAdded);

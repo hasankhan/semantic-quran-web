@@ -16,51 +16,9 @@
         ga('create', 'UA-29293370-3', 'auto');
         ga('send', 'pageview');
     </script>
-    <script type="text/template" id="tag_list_template">
-        <% tags.forEach(function(tag) { %>
-        <li class="tag <%=classes%>">
-            <span class=" tagname"><%=tag%></span>
-        </li>
-        <% }); %>
-    </script>
-    <script type="text/template" id="verse_tag_template">
-        <li class='tag'>
-            <span class="tagName"><%=tag%></span>
-            <span class="delete" data-tag="<%=tag%>" data-surah="<%=surah%>" data-verse="<%=verse%>">X</span>
-        </li>
-    </script>
-    <script type="text/template" id="result_template">
-        <% data.forEach(function(row){ %>
-        <div class="result">
-            <div class="ayahWrapper">
-                <div class="ayahRef">[<%=row.surah%>:<%=row.verse%>]</div>
-                <div class="ayah"><%=row.quran.text%></div>
-                <div class="translation"><%=row.content[0].text%></div>
-            </div>
-            <ul id="tags<%=row.surah%>_<%=row.verse%>">
-                <% row.tags.forEach(function(tag){
-                    print(tagTemplate({
-                        tag: tag,
-                        surah: row.surah,
-                        verse: row.verse
-                    }));
-                });
-                %>
-                <li class='tag addTag' data-surah="<%=row.surah%>" data-verse="<%=row.verse%>">
-                    Add tag
-                </li>
-            </ul>
-            <audio controls preload="none" onplay="pausePreviousAudio(event)">
-                <source src="<%=row.audio.mp3.url%>" type="audio/mpeg">
-                <source src="<%=row.audio.ogg.url%>" type="audio/ogg">
-            </audio>
-            <div class='clear'></div>
-        </div>
-        <% }); %>
-    </script>
 </head>
 <body>
-    <div data-role="page">
+    <div data-role="page" id='mainPage'>
         <div data-role="header" data-theme="b" data-position="fixed">
             <a href="javascript:void(0)" id="menuBtn" data-icon="bars" data-iconpos="notext">Menu</a>
             <h1>Semantic Quran</h1>
@@ -133,6 +91,48 @@
     <script src='http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js'></script>
     <script type="text/javascript" src="js/quranclient.js"></script>
     <script type="text/javascript" src="js/site.js"></script>
+    <script type="text/template" id="tag_list_template">
+        <% tags.forEach(function(tag) { %>
+        <li class="tag <%=classes%>">
+            <span class=" tagname"><%=tag%></span>
+        </li>
+        <% }); %>
+    </script>
+    <script type="text/template" id="verse_tag_template">
+        <li class='tag'>
+            <span class="tagName"><%=tag%></span>
+            <span class="delete" data-tag="<%=tag%>" data-surah="<%=surah%>" data-verse="<%=verse%>">X</span>
+        </li>
+    </script>
+    <script type="text/template" id="result_template">
+        <% data.forEach(function(row){ %>
+        <div class="result">
+            <div class="ayahWrapper">
+                <div class="ayahRef">[<%=row.surah%>:<%=row.verse%>]</div>
+                <div class="ayah"><%=row.quran.text%></div>
+                <div class="translation"><%=row.content[0].text%></div>
+            </div>
+            <ul id="tags<%=row.surah%>_<%=row.verse%>">
+                <% row.tags.forEach(function(tag){
+                print(tagTemplate({
+                tag: tag,
+                surah: row.surah,
+                verse: row.verse
+                }));
+                });
+                %>
+                <li class='tag addTag' data-surah="<%=row.surah%>" data-verse="<%=row.verse%>">
+                    Add tag
+                </li>
+            </ul>
+            <audio controls preload="none" onplay="pausePreviousAudio(event)">
+                <source src="<%=row.audio.mp3.url%>" type="audio/mpeg">
+                <source src="<%=row.audio.ogg.url%>" type="audio/ogg">
+            </audio>
+            <div class='clear'></div>
+        </div>
+        <% }); %>
+    </script>
 </body>
 
 </html>
