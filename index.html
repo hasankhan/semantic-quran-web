@@ -75,6 +75,7 @@
                 <label for="tagName">Tag</label>
                 <input type="text" name="tagName" value="" id="addTagDialogTextBox"
                        data-clear-btn="true" data-mini="true"
+                       max-length="15"
                        placeholder="(ex: heaven)">
                 <ul id="recentlyAddedTags"></ul>
                 <div data-inline="true">
@@ -119,7 +120,7 @@
             </div>
             <ul id="tags<%= row.surah %>_<%= row.verse %>">
                 <% row.tags.forEach(function(tag){
-                    print(tagTemplate({
+                print(tagTemplate({
                     tag: tag,
                     surah: row.surah,
                     verse: row.verse

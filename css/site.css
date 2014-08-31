@@ -29,6 +29,11 @@
 }
 
 li.tag {
+    float: left;
+    width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     display: inline-block;
     list-style-type: none;
     border: 1px solid gray;
@@ -38,6 +43,7 @@ li.tag {
     padding: 5px;
     margin: 1px;
     font-size: 10px;
+    text-align: center;
 }
 
 li.addTag {
