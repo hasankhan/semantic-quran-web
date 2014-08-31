@@ -37,6 +37,10 @@ var QuranClient = (function () {
         return this._get('surah');
     };
 
+    QuranClient.prototype.listTags = function () {
+        return this._get('tag');
+    }
+
     QuranClient.prototype.login = function (provider) {
         this._onLoading(true);
 

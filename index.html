@@ -22,7 +22,7 @@
         <div data-role="header" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <a href="javascript:void(0)" id="menuBtn" data-icon="bars" data-iconpos="notext">Menu</a>
             <h1>Semantic Quran</h1>
-            <h2 id='mainPageHeading'>...</h2>
+            <h2 id='mainPageHeading'></h2>
             <a href="javascript:void(0)" id="login" data-icon="user" data-iconpos="notext">Login</a>
         </div>
         <div data-role="content">
@@ -120,10 +120,10 @@
             </div>
             <ul id="tags<%= row.surah %>_<%= row.verse %>">
                 <% row.tags.forEach(function(tag){
-                print(tagTemplate({
-                    tag: tag,
-                    surah: row.surah,
-                    verse: row.verse
+                    print(tagTemplate({
+                        tag: tag,
+                        surah: row.surah,
+                        verse: row.verse
                     }));
                 });
                 %>

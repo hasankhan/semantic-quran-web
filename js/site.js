@@ -1,5 +1,4 @@
 var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHbuHsfhRmylXmwQgOKAsnmUyKG49'),
-    tagsMRU = [],
     tagsRecentlyAdded = [],
     resultTemplate,
     tagListTemplate,
@@ -41,6 +40,7 @@ var MainView = Backbone.View.extend({
 
     initialize: function () {
         this.navPanel = $('#nav-panel');
+        updateMRU();
     },
 
     toggleMenu: function () {
@@ -170,10 +170,6 @@ $(function () {
     });
 
     if (typeof (Storage) !== "undefined") {
-        if (localStorage.tagsMRU) {
-            tagsMRU = JSON.parse(localStorage.tagsMRU);
-            updateMRU();
-        }
         if (localStorage.tagsRecentlyAdded) {
             tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
             updateRecentlyAddedTags();
@@ -226,14 +222,14 @@ function doDeleteTag(val, surahNum, verseNum) {
 }
 
 function updateMRU() {
-    var container = $('#lastUsedTags').html(tagListTemplate({
-        tags: tagsMRU,
-        classes: ''
-    }));
-
-    if (typeof (Storage) !== "undefined") {
-        localStorage.tagsMRU = JSON.stringify(tagsMRU);
-    }
+    var lastUsedTags = $('#lastUsedTags');
+    client.listTags()
+          .done(function (tags) {
+              lastUsedTags.html(tagListTemplate({
+                  tags: tags,
+                  classes: ''
+              }));
+          });
 }
 
 function updateRecentlyAddedTags() {
@@ -264,21 +260,6 @@ function doSearch(val) {
                 .done(function (result) {
                     loadResults(result || [], true);
                 });
-
-    // Add the search to our recent searches
-    var isInList = false;
-    $.each(tagsMRU, function (i, entry) {
-        if (entry === val) {
-            isInList = true;
-            return false;
-        }
-    });
-
-    if (!isInList) {
-        tagsMRU.unshift(val);
-        tagsMRU = tagsMRU.slice(0, 7);
-        updateMRU();
-    }
 }
 
 function doViewPassage(surah, ayahStart, ayahEnd) {
