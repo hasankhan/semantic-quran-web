@@ -22,6 +22,7 @@
         <div data-role="header" data-theme="b" data-position="fixed">
             <a href="javascript:void(0)" id="menuBtn" data-icon="bars" data-iconpos="notext">Menu</a>
             <h1>Semantic Quran</h1>
+            <h2 id='mainPageHeading'>...</h2>
             <a href="javascript:void(0)" id="login" data-icon="user" data-iconpos="notext">Login</a>
         </div>
         <div data-role="content">
@@ -112,18 +113,18 @@
         <% data.forEach(function(row){ %>
         <div class="result">
             <div class="ayahWrapper">
-                <div class="ayahRef">[<%= row.surah %>:<%= row.verse %>]</div>
+                <div class="ayahRef">[<span data-surah="<%= row.surah %>" class='surahRef'><%= row.surah %></span>:<%= row.verse %>]</div>
                 <div class="ayah"><%= row.quran.text %></div>
                 <div class="translation"><%= row.content[0].text %></div>
             </div>
             <ul id="tags<%= row.surah %>_<%= row.verse %>">
                 <% row.tags.forEach(function(tag){
-                    print(tagTemplate({
-                        tag: tag,
-                        surah: row.surah,
-                        verse: row.verse
-                        }));
-                    });
+                print(tagTemplate({
+                tag: tag,
+                surah: row.surah,
+                verse: row.verse
+                }));
+                });
                 %>
                 <li class='tag addTag' data-surah="<%= row.surah %>" data-verse="<%= row.verse %>">
                     Add tag

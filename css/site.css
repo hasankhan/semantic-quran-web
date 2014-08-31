@@ -19,6 +19,10 @@
     float: left;
 }
 
+.result .surahRef {
+    cursor: pointer
+}
+
 .result .translation {
     font-size: 15px;
     padding-top: 5px;

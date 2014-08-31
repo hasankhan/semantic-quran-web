@@ -39,9 +39,17 @@ var QuranClient = (function () {
 
     QuranClient.prototype.login = function (provider) {
         this._onLoading(true);
+
+        var self = this;
         return this.client.login(provider)
-                          .then(this._onSuccess.bind(this),
-                                this._onError.bind(this));
+                          .then(function (res) {
+                              self._onLoading(false);
+                              return res;
+                          },
+                          function (err) {
+                              self._onLoading(false);
+                              throw err;
+                          });
     };
 
     QuranClient.prototype._onLoading = function (state) {
@@ -49,16 +57,6 @@ var QuranClient = (function () {
             this.onLoading(state);
         }
     }
-
-    QuranClient.prototype._onSuccess = function (res) {
-        this._onLoading(false);
-        return res;
-    };
-
-    QuranClient.prototype._onError = function (err) {
-        this._onLoading(false);
-        throw err;
-    };
 
     QuranClient.prototype._get = function (path) {
         return this._invoke(path, {
@@ -80,11 +78,25 @@ var QuranClient = (function () {
         });
     };
 
-    QuranClient.prototype._invoke = function () {
+    QuranClient.prototype._invoke = function (path, settings) {
         this._onLoading(true);
-        return this.client.invokeApi.apply(this.client, arguments)
-                                     .then(this._onSuccess.bind(this),
-                                           this._onError.bind(this));
+
+        var url = this.client.applicationUrl + 'api/' + path,
+            req = {
+                type: settings.method.toUpperCase(),
+                url: url,
+                data: settings.body,
+                headers: {}
+            };
+
+        if (this.client.currentUser) {
+            req.headers['x-zumo-auth'] = this.client.currentUser.mobileServiceAuthenticationToken;
+        }
+
+        var self = this;
+        return $.ajax(req).always(function () {
+            self._onLoading(false);
+        });
     };
 
     return QuranClient;
