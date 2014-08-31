@@ -19,7 +19,7 @@
 </head>
 <body>
     <div data-role="page" id='mainPage'>
-        <div data-role="header" data-theme="b" data-position="fixed">
+        <div data-role="header" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <a href="javascript:void(0)" id="menuBtn" data-icon="bars" data-iconpos="notext">Menu</a>
             <h1>Semantic Quran</h1>
             <h2 id='mainPageHeading'>...</h2>
@@ -29,9 +29,9 @@
             <div class="resultsPane">
             </div>
         </div>
-        <div data-role="footer" data-theme="b" data-position="fixed">
+        <div data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
-                <option value="1">Al-Fatihah</option>
+                <option value="1">1: Al-Fatihah</option>
             </select>
             <a class="ui-btn-right" data-iconpos="notext"
                data-icon="info" target="_blank"
@@ -119,11 +119,11 @@
             </div>
             <ul id="tags<%= row.surah %>_<%= row.verse %>">
                 <% row.tags.forEach(function(tag){
-                print(tagTemplate({
-                tag: tag,
-                surah: row.surah,
-                verse: row.verse
-                }));
+                    print(tagTemplate({
+                    tag: tag,
+                    surah: row.surah,
+                    verse: row.verse
+                    }));
                 });
                 %>
                 <li class='tag addTag' data-surah="<%= row.surah %>" data-verse="<%= row.verse %>">
