@@ -3,7 +3,7 @@ Semantic Quran
 
 There are many verses in the Holy Quran that relate to certain topics but if we try to search for them based on keywords, we won't be able to find them because the search keyword may not be present in the translation of the verse itself.
 
-For example in verse (94:6) Allah (SWT) says, "Indeed, with hardship will be ease.". This verse is about hope and patience for believers who are in difficulty but the word 'hope' or 'patience' itself is not present in the verse and we won't be able to find this verse if we were to search for it.
+For example in verse [(94:6)](http://semquran.com#94/6) Allah (SWT) says, "Indeed, with hardship will be ease.". This verse is about hope and patience for believers who are in difficulty but the word 'hope' or 'patience' itself is not present in the verse and we won't be able to find this verse if we were to search for it.
 
 Tagging verses with words helps us categorize them in topics. This is useful in exploring Quran based on topics and identifying patterns and descriptions from Allah (SWT) about matters in a way not commonly used before.
 
