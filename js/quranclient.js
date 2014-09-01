@@ -42,18 +42,7 @@ var QuranClient = (function () {
     }
 
     QuranClient.prototype.login = function (provider) {
-        this._onLoading(true);
-
-        var self = this;
-        return this.client.login(provider)
-                          .then(function (res) {
-                              self._onLoading(false);
-                              return res;
-                          },
-                          function (err) {
-                              self._onLoading(false);
-                              throw err;
-                          });
+        return this.client.login(provider);
     };
 
     QuranClient.prototype._onLoading = function (state) {

@@ -3,6 +3,7 @@ var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHb
     resultTemplate,
     tagListTemplate,
     verseTagTemplate,
+    surahTitleTemplate,
     resultPane,
     router,
     mainView,
@@ -18,11 +19,11 @@ $.mobile.hashListeningEnabled = false;
 
 var Workspace = Backbone.Router.extend({
     routes: {
-        "": "home",
-        "search/:tag": "search",
-        ":surah/:start-:end": "viewPassage",
-        ":surah/:start": "viewPassage",
-        ":surah": "viewPassage"
+        '': 'home',
+        'search/:tag': 'search',
+        ':surah/:start-:end': 'viewPassage',
+        ':surah/:start': 'viewPassage',
+        ':surah': 'viewPassage'
     },
 
     home: doViewPassage.bind(this, 1),
@@ -31,11 +32,12 @@ var Workspace = Backbone.Router.extend({
 });
 
 var MainView = Backbone.View.extend({
-    el: $("#mainPage"),
+    el: $('#mainPage'),
 
     events: {
-        "click #menuBtn": "toggleMenu",
-        "click .surahRef": "changeSurah",
+        'click #menuBtn': 'toggleMenu',
+        'click .surahRef': 'changeSurah',
+        'click #loginBtn': 'login'
     },
 
     initialize: function () {
@@ -51,13 +53,24 @@ var MainView = Backbone.View.extend({
         var surahRef = $(e.target);
         var surah = surahRef.data('surah');
         setTimeout(changeSurah.bind(null, surah), 1);
+    },
+
+    login: function (e) {
+        var self = this;
+        client.login('facebook').done(function () {
+            $(e.target).hide();
+            self.$el.addClass('loggedin');
+        }, function (err) {
+            alert('Error: ' + err);
+        });
     }
 });
 
 $(function () {
-    resultTemplate = _.template($("#result_template").html());
-    verseTagTemplate = _.template($("#verse_tag_template").html());
-    tagListTemplate = _.template($("#tag_list_template").html());
+    resultTemplate = _.template($('#result_template').html());
+    verseTagTemplate = _.template($('#verse_tag_template').html());
+    tagListTemplate = _.template($('#tag_list_template').html());
+    surahTitleTemplate = _.template($('#surah_title_template').html());
     resultPane = $('.resultsPane');
     mainPageHeading = $('#mainPageHeading');
 
@@ -76,26 +89,17 @@ $(function () {
         return false;
     });
 
-    var loginBtn = $("#login");
-    loginBtn.click(function () {
-        client.login('facebook').done(function () {
-            loginBtn.hide();
-        }, function (err) {
-            alert("Error: " + err);
-        });
-    });
-
-    var $body = $("body");
-    $body.on("click", ".tag", function () {
+    var $body = $('body');
+    $body.on('click', '.tag', function () {
         var $this = $(this);
 
-        if (!$this.hasClass("addTag") && !$this.hasClass("recentTag")) {
-            var val = $(".tagName", $this).text();
+        if (!$this.hasClass('addTag') && !$this.hasClass('recentTag')) {
+            var val = $('.tagName', $this).text();
             onSearch(val);
         }
     });
 
-    $body.on("click", "span.delete", function () {
+    $body.on('click', 'span.delete', function () {
         var $this = $(this);
         var data = $this.data();
         var parent = $this.parent().remove();
@@ -104,9 +108,9 @@ $(function () {
         return false;
     });
 
-    $("#addTagDialogButton").click(function () {
+    $('#addTagDialogButton').click(function () {
         var data = $('#addTagForm').data();
-        var $textBox = $("#addTagDialogTextBox");
+        var $textBox = $('#addTagDialogTextBox');
         var tags = $textBox.val();
         var surahNum = data.surah;
         var verseNum = data.verse;
@@ -117,7 +121,7 @@ $(function () {
             var values = tags.split(/[,;]/);
             $.each(values, function (i, value) {
                 doAddTag(value, surahNum, verseNum).done(function (result) {
-                    console.log("Successfully Added: " + result.text);
+                    console.log('Successfully Added: ' + result.text);
 
                     // Update the local row
                     var tagGroup = $('#tags' + surahNum + '_' + verseNum);
@@ -131,29 +135,29 @@ $(function () {
             });
         }
 
-        $("#addTagPanel").panel("close");
+        $('#addTagPanel').panel('close');
         return false;
     });
 
-    $body.on("click", ".addTag", function (event) {
+    $body.on('click', '.addTag', function (event) {
         var data = $(this).data();
 
         var form = $('#addTagForm');
         form.data('surah', data.surah);
         form.data('verse', data.verse);
 
-        var textBox = $("#addTagDialogTextBox").val("");
+        var textBox = $('#addTagDialogTextBox').val('');
 
-        $("#addTagPanel").panel('open');
+        $('#addTagPanel').panel('open');
         setTimeout(function () {
             textBox.focus();
         }, 500);
     });
 
-    $("#recentlyAddedTags").on("click", ".recentTag", function () {
+    $('#recentlyAddedTags').on('click', '.recentTag', function () {
         var $this = $(this);
-        var $textBox = $("#addTagDialogTextBox");
-        var val = $(".tagName", $this).text();
+        var $textBox = $('#addTagDialogTextBox');
+        var val = $('.tagName', $this).text();
         var existing = $textBox.val();
         if (existing) {
             val = existing + ',' + val;
@@ -161,22 +165,22 @@ $(function () {
         $textBox.val(val);
     });
 
-    $("#searchButton").click(function () {
-        var val = $("#search-tag").val();
+    $('#searchButton').click(function () {
+        var val = $('#search-tag').val();
 
         if (val && val.length > 0) {
             onSearch(val);
         }
     });
 
-    if (typeof (Storage) !== "undefined") {
+    if (typeof (Storage) !== 'undefined') {
         if (localStorage.tagsRecentlyAdded) {
             tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
             updateRecentlyAddedTags();
         }
     }
 
-    var surahSelector = $("#surahSelect");
+    var surahSelector = $('#surahSelect');
     surahListTemplate = _.template($('#surah_list_template').html());
     surahSelector.click(onSurahChanged);
     client.listSurahs()
@@ -192,7 +196,7 @@ client.onLoading = function (loading) {
 };
 
 function doAddTag(val, surahNum, verseNum) {
-    console.log("Adding tag: " + val + " to " + "[" + surahNum + ":" + verseNum + "]");
+    console.log('Adding tag: ' + val + ' to ' + '[' + surahNum + ':' + verseNum + ']');
 
     // Add the tag to our recently added tags
     var isInList = false;
@@ -213,11 +217,11 @@ function doAddTag(val, surahNum, verseNum) {
 }
 
 function doDeleteTag(val, surahNum, verseNum) {
-    console.log("Deleting tag: " + val + " to " + "[" + surahNum + ":" + verseNum + "]");
+    console.log('Deleting tag: ' + val + ' to ' + '[' + surahNum + ':' + verseNum + ']');
 
     client.removeTag(surahNum, verseNum, val)
             .done(function () {
-                console.log("Successfully Deleted")
+                console.log('Successfully Deleted')
             });
 }
 
@@ -238,7 +242,7 @@ function updateRecentlyAddedTags() {
         classes: 'recentTag'
     }));
 
-    if (typeof (Storage) !== "undefined") {
+    if (typeof (Storage) !== 'undefined') {
         localStorage.tagsRecentlyAdded = JSON.stringify(tagsRecentlyAdded);
     }
 }
@@ -253,7 +257,7 @@ function doSearch(val) {
     currentSurah = 0;
     window.enableAutoScroll = false;
 
-    console.log("Doing search for: " + val);
+    console.log('Doing search for: ' + val);
     var resultPane = $('.resultsPane').empty();
 
     client.findVersesByTag(val)
@@ -281,7 +285,7 @@ function doViewPassage(surah, ayahStart, ayahEnd) {
 function updateSurahTitle() {
     if (currentSurah > 0 && surahList.length > 0) {
         var surah = surahList[currentSurah - 1];
-        var title = currentSurah + ': ' + surah.name.simple + ' - ' + surah.name.english;
+        var title = surahTitleTemplate(surah);
         updateTitle(title);
     }
 }
@@ -336,7 +340,7 @@ function loadResults(data, animate) {
 }
 
 function onSurahChanged() {
-    var surah = $("#surahSelect").val();
+    var surah = $('#surahSelect').val();
     changeSurah(surah);
 }
 

@@ -18,12 +18,12 @@
     </script>
 </head>
 <body>
-    <div data-role="page" id='mainPage'>
+    <div data-role="page" id="mainPage">
         <div data-role="header" data-theme="b" data-position="fixed" data-tap-toggle="false">
             <a href="javascript:void(0)" id="menuBtn" data-icon="bars" data-iconpos="notext">Menu</a>
             <h1>Semantic Quran</h1>
-            <h2 id='mainPageHeading'></h2>
-            <a href="javascript:void(0)" id="login" data-icon="user" data-iconpos="notext">Login</a>
+            <h2 id="mainPageHeading"></h2>
+            <a href="javascript:void(0)" id="loginBtn" data-icon="user" data-iconpos="notext">Login</a>
         </div>
         <div data-role="content">
             <div class="resultsPane">
@@ -65,7 +65,7 @@
                 </li>
                 <li data-filtertext="wai-aria">
                     <h3>Latest Tags</h3>
-                    <ul id='lastUsedTags'></ul>
+                    <ul id="lastUsedTags"></ul>
                 </li>
             </ul>
         </div>
@@ -89,9 +89,12 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
-    <script src='http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js'></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js"></script>
     <script type="text/javascript" src="js/quranclient.js"></script>
     <script type="text/javascript" src="js/site.js"></script>
+    <script type="text/template" id="surah_title_template">
+        <%= id %>: <%= name.simple %> - <%= name.english %>
+    </script>
     <script type="text/template" id="surah_list_template">
         <% surahs.forEach(function(surah) { %>
         <option value="<%= surah.id %>"><%= surah.id %>: <%= surah.name.simple %></option>
@@ -105,16 +108,16 @@
         <% }); %>
     </script>
     <script type="text/template" id="verse_tag_template">
-        <li class='tag'>
+        <li class="tag">
             <span class="tagName"><%= tag %></span>
-            <span class="delete" data-tag="<%= tag %>" data-surah="<%= surah %>" data-verse="<%= verse %>">X</span>
+            <span class="delete loggedin-action" data-tag="<%= tag %>" data-surah="<%= surah %>" data-verse="<%= verse %>">X</span>
         </li>
     </script>
     <script type="text/template" id="result_template">
         <% data.forEach(function(row){ %>
         <div class="result">
             <div class="ayahWrapper">
-                <div class="ayahRef">[<span data-surah="<%= row.surah %>" class='surahRef'><%= row.surah %></span>:<%= row.verse %>]</div>
+                <div class="ayahRef">[<span data-surah="<%= row.surah %>" class="surahRef"><%= row.surah %></span>:<%= row.verse %>]</div>
                 <div class="ayah"><%= row.quran.text %></div>
                 <div class="translation"><%= row.content[0].text %></div>
             </div>
@@ -127,7 +130,7 @@
                     }));
                 });
                 %>
-                <li class='tag addTag' data-surah="<%= row.surah %>" data-verse="<%= row.verse %>">
+                <li class="tag addTag loggedin-action" data-surah="<%= row.surah %>" data-verse="<%= row.verse %>">
                     Add tag
                 </li>
             </ul>
@@ -135,7 +138,7 @@
                 <source src="<%= row.audio.mp3.url %>" type="audio/mpeg">
                 <source src="<%= row.audio.ogg.url %>" type="audio/ogg">
             </audio>
-            <div class='clear'></div>
+            <div class="clear"></div>
         </div>
         <% }); %>
     </script>
