@@ -39,7 +39,7 @@
                 View source
             </a>
         </div>
-        <div data-role="panel" data-position="left" data-position-fixed="true" data-display="reveal" id="nav-panel">
+        <div data-role="panel" data-position="left" data-position-fixed="true" data-display="overlay" id="nav-panel">
             <ul data-role="listview" style="margin-top:-16px;" class="nav-search">
                 <li data-filtertext="wai-aria">
                     <h3>Search Tags</h3>
@@ -64,7 +64,7 @@
                     </ul>
                 </li>
                 <li data-filtertext="wai-aria">
-                    <h3>Last Used Tags</h3>
+                    <h3>Latest Tags</h3>
                     <ul id='lastUsedTags'></ul>
                 </li>
             </ul>
@@ -120,7 +120,7 @@
             </div>
             <ul id="tags<%= row.surah %>_<%= row.verse %>">
                 <% row.tags.forEach(function(tag){
-                    print(tagTemplate({
+                print(tagTemplate({
                         tag: tag,
                         surah: row.surah,
                         verse: row.verse
