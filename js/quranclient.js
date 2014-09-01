@@ -5,11 +5,7 @@ var QuranClient = (function () {
     }
 
     QuranClient.prototype.addTag = function (surah, verse, tag) {
-        return this._post('tag', {
-            surah: surah,
-            verse: verse,
-            tag: tag
-        });
+        return this._post('tag/' + tag + '/' + surah + '/' + verse);
     };
 
     QuranClient.prototype.removeTag = function (surah, verse, tag) {
