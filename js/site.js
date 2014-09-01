@@ -280,7 +280,9 @@ function doViewPassage(surah, ayahStart, ayahEnd) {
 
 function updateSurahTitle() {
     if (currentSurah > 0 && surahList.length > 0) {
-        updateTitle(currentSurah + ': ' + surahList[currentSurah - 1].name.simple);
+        var surah = surahList[currentSurah - 1];
+        var title = currentSurah + ': ' + surah.name.simple + ' - ' + surah.name.english;
+        updateTitle(title);
     }
 }
 
@@ -323,7 +325,7 @@ function pausePreviousAudio(e) {
 }
 
 function loadResults(data, animate) {
-    resultPane.html(resultTemplate({
+    resultPane.append(resultTemplate({
         data: data,
         tagTemplate: verseTagTemplate
     }));
