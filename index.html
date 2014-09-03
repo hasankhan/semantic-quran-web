@@ -23,7 +23,11 @@
             <a href="javascript:void(0)" id="menuBtn" data-icon="bars" data-iconpos="notext">Menu</a>
             <h1>Semantic Quran</h1>
             <h2 id="mainPageHeading"></h2>
-            <a href="javascript:void(0)" id="loginBtn" data-icon="user" data-iconpos="notext">Login</a>
+            <div class="ui-btn-right">
+                <form id="searchForm">
+                    <input type="search" name="searchbar" id="search" value="" data-theme="a" />
+                </form>
+            </div>
         </div>
         <div data-role="content">
             <div class="resultsPane">
@@ -42,9 +46,7 @@
         <div data-role="panel" data-position="left" data-position-fixed="true" data-display="overlay" id="nav-panel">
             <ul data-role="listview" style="margin-top:-16px;" class="nav-search">
                 <li data-filtertext="wai-aria">
-                    <h3>Search Tags</h3>
-                    <input type="search" name="search-tag" id="search-tag" value="">
-                    <button id="searchButton" type="button">Search</button>
+                    <a href="javascript:void(0)" id="loginBtn" data-icon="user" data-iconpos="notext" data-inline="true">Login</a>
                 </li>
                 <li data-filtertext="wai-aria">
                     <h3>Suggested Tags</h3>

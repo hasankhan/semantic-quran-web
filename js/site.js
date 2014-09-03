@@ -37,12 +37,24 @@ var MainView = Backbone.View.extend({
     events: {
         'click #menuBtn': 'toggleMenu',
         'click .surahRef': 'changeSurah',
-        'click #loginBtn': 'login'
+        'click #loginBtn': 'login',
+        'submit #searchForm': 'onSearchSubmit',
     },
 
     initialize: function () {
         this.navPanel = $('#nav-panel');
+        this.searchBox = $('#search');
         updateMRU();
+    },
+
+    onSearchSubmit: function () {
+        var val = this.searchBox.val();
+        if (val && val.length > 0) {
+            onSearch(val);
+        }
+        this.searchBox.val('');
+
+        return false;
     },
 
     toggleMenu: function () {
@@ -163,14 +175,6 @@ $(function () {
             val = existing + ',' + val;
         }
         $textBox.val(val);
-    });
-
-    $('#searchButton').click(function () {
-        var val = $('#search-tag').val();
-
-        if (val && val.length > 0) {
-            onSearch(val);
-        }
     });
 
     if (typeof (Storage) !== 'undefined') {
