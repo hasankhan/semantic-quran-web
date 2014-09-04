@@ -1,5 +1,4 @@
 <html>
-
 <head>
     <title>Symantic Quran</title>
     <meta name="viewport" content="initial-scale=0.25">
@@ -45,22 +44,22 @@
         </div>
         <div data-role="panel" data-position="left" data-position-fixed="true" data-display="overlay" id="nav-panel">
             <ul data-role="listview" style="margin-top:-16px;" class="nav-search">
-                <li data-filtertext="wai-aria">
+                <li data-filtertext="wai-aria" id="loginRow" class="hidden">
                     <a href="javascript:void(0)" id="loginBtn" data-icon="user" data-iconpos="notext" data-inline="true">Login</a>
                 </li>
                 <li data-filtertext="wai-aria">
                     <h3>Suggested Tags</h3>
                     <ul>
-                        <li class="tag">
+                        <li class="tag" data-tag="marriage">
                             <span class="tagName">marriage</span>
                         </li>
-                        <li class="tag">
+                        <li class="tag" data-tag="dua">
                             <span class="tagName">dua</span>
                         </li>
-                        <li class="tag">
+                        <li class="tag" data-tag="heaven">
                             <span class="tagName">heaven</span>
                         </li>
-                        <li class="tag">
+                        <li class="tag" data-tag="hell">
                             <span class="tagName">hell</span>
                         </li>
                     </ul>
@@ -93,6 +92,7 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
     <script src="http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js"></script>
     <script type="text/javascript" src="js/quranclient.js"></script>
+    <script type="text/javascript" src="js/modernizr.js"></script>
     <script type="text/javascript" src="js/site.js"></script>
     <script type="text/template" id="surah_title_template">
         <%= id %>: <%= name.simple %> - <%= name.english %>
@@ -104,13 +104,13 @@
     </script>
     <script type="text/template" id="tag_list_template">
         <% tags.forEach(function(tag) { %>
-        <li class="tag <%= classes %>">
-            <span class=" tagname"><%= tag %></span>
+        <li class="tag <%= classes %>" data-tag="<%= tag %>">
+            <span class="tagName"><%= tag %></span>
         </li>
         <% }); %>
     </script>
     <script type="text/template" id="verse_tag_template">
-        <li class="tag">
+        <li class="tag" data-tag="<%= tag %>">
             <span class="tagName"><%= tag %></span>
             <span class="delete loggedin-action" data-tag="<%= tag %>" data-surah="<%= surah %>" data-verse="<%= verse %>">X</span>
         </li>
@@ -145,5 +145,4 @@
         <% }); %>
     </script>
 </body>
-
 </html>

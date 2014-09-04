@@ -45,6 +45,9 @@ var MainView = Backbone.View.extend({
         this.navPanel = $('#nav-panel');
         this.searchBox = $('#search');
         updateMRU();
+        if (client.canLogin) {
+            $('#loginRow').removeClass('hidden');
+        }
     },
 
     onSearchSubmit: function () {
@@ -106,8 +109,8 @@ $(function () {
         var $this = $(this);
 
         if (!$this.hasClass('addTag') && !$this.hasClass('recentTag')) {
-            var val = $('.tagName', $this).text();
-            onSearch(val);
+            var tag = $this.data('tag');
+            onSearch(tag);
         }
     });
 
@@ -177,15 +180,13 @@ $(function () {
         $textBox.val(val);
     });
 
-    if (typeof (Storage) !== 'undefined') {
-        if (localStorage.tagsRecentlyAdded) {
-            tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
-            updateRecentlyAddedTags();
-        }
+    if (Modernizr.localStorage && localStorage.tagsRecentlyAdded) {
+        tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
+        updateRecentlyAddedTags();
     }
 
     var surahSelector = $('#surahSelect');
-    surahListTemplate = _.template($('#surah_list_template').html());
+    var surahListTemplate = _.template($('#surah_list_template').html());
     surahSelector.click(onSurahChanged);
     client.listSurahs()
             .done(function (result) {
@@ -246,7 +247,7 @@ function updateRecentlyAddedTags() {
         classes: 'recentTag'
     }));
 
-    if (typeof (Storage) !== 'undefined') {
+    if (Modernizr.localStorage) {
         localStorage.tagsRecentlyAdded = JSON.stringify(tagsRecentlyAdded);
     }
 }

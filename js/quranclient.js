@@ -1,7 +1,15 @@
 var QuranClient = (function () {
 
     function QuranClient(host, key) {
-        this.client = new WindowsAzure.MobileServiceClient(host, key);
+        this.host = host;
+
+        var clientLoaded = typeof WindowsAzure !== 'undefined' &&
+                           typeof WindowsAzure.MobileServiceClient !== 'undefined';
+
+        if (clientLoaded) {
+            this.client = new WindowsAzure.MobileServiceClient(host, key);
+            this.canLogin = true;
+        }
     }
 
     QuranClient.prototype.addTag = function (surah, verse, tag) {
@@ -38,7 +46,9 @@ var QuranClient = (function () {
     }
 
     QuranClient.prototype.login = function (provider) {
-        return this.client.login(provider);
+        if (this.client) {
+            return this.client.login(provider);
+        }
     };
 
     QuranClient.prototype._onLoading = function (state) {
@@ -70,7 +80,7 @@ var QuranClient = (function () {
     QuranClient.prototype._invoke = function (path, settings) {
         this._onLoading(true);
 
-        var url = this.client.applicationUrl + 'api/' + path,
+        var url = this.host + 'api/' + path,
             req = {
                 type: settings.method.toUpperCase(),
                 url: url,
@@ -78,7 +88,7 @@ var QuranClient = (function () {
                 headers: {}
             };
 
-        if (this.client.currentUser) {
+        if (this.client && this.client.currentUser) {
             req.headers['x-zumo-auth'] = this.client.currentUser.mobileServiceAuthenticationToken;
         }
 

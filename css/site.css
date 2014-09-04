@@ -1,3 +1,7 @@
+.hidden {
+    display: none !important;
+}
+
 .result {    
     background-color: beige;
     border: 1px solid black;
