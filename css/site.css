@@ -87,6 +87,7 @@ audio {
 }
 
 #recentlyAddedTags {
+    display: inline-block;
     max-width: 300px;
     margin: 0 auto;
     padding: 10px;

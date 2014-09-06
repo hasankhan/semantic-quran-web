@@ -4,10 +4,11 @@ var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHb
     resultTemplate,
     tagListTemplate,
     verseTagTemplate,
+    surahSelector,
     surahTitleTemplate,
     resultPane,
     router,
-    mainView,
+    appView,
     currentSurah,
     mainPageHeading,
     surahList = [],
@@ -33,6 +34,14 @@ var Workspace = Backbone.Router.extend({
     search: doSearch.bind(this)
 });
 
+var AppView = Backbone.View.extend({
+    el: $('body'),
+
+    initialize: function () {
+        this.mainView = new MainView();
+    }
+});
+
 var MainView = Backbone.View.extend({
     el: $('#mainPage'),
 
@@ -41,92 +50,27 @@ var MainView = Backbone.View.extend({
         'click .surahRef': 'changeSurah',
         'click #loginBtn': 'login',
         'submit #searchForm': 'onSearchSubmit',
+        'submit #addTagForm': 'onAddTagFormSubmit',
+        'click #addTagDialogButton': 'onAddTagFormSubmit',
+        'click .tag': 'onTagClick',
+        'click span.delete': 'onDelTagClick',
+        'click .addTag': 'onAddTagClick'
     },
 
     initialize: function () {
         this.navPanel = $('#nav-panel');
         this.searchBox = $('#search');
+        this.addTagPanel = $('#addTagPanel');
+        this.addTagForm = $('#addTagForm');
+
         updateMRU();
         if (client.canLogin) {
             $('#loginRow').removeClass('hidden');
         }
     },
 
-    onSearchSubmit: function () {
-        var val = this.searchBox.val();
-        if (val && val.length > 0) {
-            onSearch(val);
-        }
-        this.searchBox.val('');
-
-        return false;
-    },
-
-    toggleMenu: function () {
-        this.navPanel.panel('toggle');
-    },
-
-    changeSurah: function (e) {
-        var surahRef = $(e.target);
-        var surah = surahRef.data('surah');
-        setTimeout(changeSurah.bind(null, surah), 1);
-    },
-
-    login: function (e) {
-        var self = this;
-        client.login('facebook').done(function () {
-            $(e.target).hide();
-            self.$el.addClass('loggedin');
-        }, function (err) {
-            alert('Error: ' + err);
-        });
-    }
-});
-
-$(function () {
-    resultTemplate = _.template($('#result_template').html());
-    verseTagTemplate = _.template($('#verse_tag_template').html());
-    tagListTemplate = _.template($('#tag_list_template').html());
-    surahTitleTemplate = _.template($('#surah_title_template').html());
-    resultPane = $('.resultsPane');
-    mainPageHeading = $('#mainPageHeading');
-
-    mainView = new MainView();
-    router = new Workspace();
-    Backbone.history.start();
-
-    $(window).scroll(function () {
-        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
-            scrollMore();
-        }
-    });
-
-    $('#addTagForm').submit(function () {
-        $('#addTagDialogButton').click();
-        return false;
-    });
-
-    var $body = $('body');
-    $body.on('click', '.tag', function () {
-        var $this = $(this);
-
-        if (!$this.hasClass('addTag') && !$this.hasClass('recentTag')) {
-            var tag = $this.data('tag');
-            onSearch(tag);
-        }
-    });
-
-    $body.on('click', 'span.delete', function () {
-        var $this = $(this);
-        var data = $this.data();
-        var parent = $this.parent().remove();
-        doDeleteTag(data.tag, data.surah, data.verse);
-
-        return false;
-    });
-
-    $('#addTagDialogButton').click(function () {
-        var data = $('#addTagForm').data();
+    onAddTagFormSubmit: function (e) {
+        var data = this.addTagForm.data();
         var $textBox = $('#addTagDialogTextBox');
         var tags = $textBox.val();
         var surahNum = data.surah;
@@ -154,21 +98,87 @@ $(function () {
 
         $('#addTagPanel').panel('close');
         return false;
-    });
+    },
 
-    $body.on('click', '.addTag', function (event) {
-        var data = $(this).data();
+    onAddTagClick: function (e) {
+        var data = $(e.currentTarget).data();
 
-        var form = $('#addTagForm');
-        form.data('surah', data.surah);
-        form.data('verse', data.verse);
+        this.addTagForm.data('surah', data.surah);
+        this.addTagForm.data('verse', data.verse);
 
         var textBox = $('#addTagDialogTextBox').val('');
 
-        $('#addTagPanel').panel('open');
+        this.addTagPanel.panel('open');
         setTimeout(function () {
             textBox.focus();
         }, 500);
+    },
+
+    onDelTagClick: function (e) {
+        var tagEl = $(e.currentTarget);
+        var data = tagEl.data();
+        var parent = tagEl.parent().remove();
+        doDeleteTag(data.tag, data.surah, data.verse);
+
+        return false;
+    },
+
+    onTagClick: function (e) {
+        var tagEl = $(e.currentTarget);
+        if (!tagEl.hasClass('addTag') && !tagEl.hasClass('recentTag')) {
+            var tag = tagEl.data('tag');
+            onSearch(tag);
+        }
+    },
+
+    onSearchSubmit: function () {
+        var val = this.searchBox.val();
+        if (val && val.length > 0) {
+            onSearch(val);
+        }
+        this.searchBox.val('');
+
+        return false;
+    },
+
+    toggleMenu: function () {
+        this.navPanel.panel('toggle');
+    },
+
+    changeSurah: function (e) {
+        var surahRef = $(e.currentTarget);
+        var surah = surahRef.data('surah');
+        setTimeout(changeSurah.bind(null, surah), 1);
+    },
+
+    login: function (e) {
+        var self = this;
+        client.login('facebook').done(function () {
+            $(e.target).hide();
+            self.$el.addClass('loggedin');
+        }, function (err) {
+            alert('Error: ' + err);
+        });
+    }
+});
+
+$(function () {
+    resultTemplate = _.template($('#result_template').html());
+    verseTagTemplate = _.template($('#verse_tag_template').html());
+    tagListTemplate = _.template($('#tag_list_template').html());
+    surahTitleTemplate = _.template($('#surah_title_template').html());
+    resultPane = $('.resultsPane');
+    mainPageHeading = $('#mainPageHeading');
+    surahSelector = $('#surahSelect');
+
+    appView = new AppView();
+    router = new Workspace();
+    Backbone.history.start();
+
+    $(window).scroll(function () {
+        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+            scrollMore();
+        }
     });
 
     $('#recentlyAddedTags').on('click', '.recentTag', function () {
@@ -187,9 +197,8 @@ $(function () {
         updateRecentlyAddedTags();
     }
 
-    var surahSelector = $('#surahSelect');
     var surahListTemplate = _.template($('#surah_list_template').html());
-    surahSelector.click(onSurahChanged);
+    surahSelector.change(onSurahChanged);
     client.listSurahs()
             .done(function (result) {
                 surahList = result || [];
@@ -197,9 +206,9 @@ $(function () {
                     nameSurahMap[surah.name.arabic.toLowerCase()] = surah.id;
                     nameSurahMap[surah.name.english.toLowerCase()] = surah.id;
                     nameSurahMap[surah.name.simple.toLowerCase()] = surah.id;
-                });
-                updateSurahTitle();
-                surahSelector.html(surahListTemplate({ surahs: surahList }));
+                });                
+                surahSelector.append(surahListTemplate({ surahs: surahList }));
+                updateCurrentSurah();
             });
 });
 
@@ -276,7 +285,7 @@ function doSearch(val) {
     }
 
     updateTitle('tag: ' + val);
-    currentSurah = 0;
+    setCurrentSurah(0);
     window.enableAutoScroll = false;
 
     console.log('Doing search for: ' + val);
@@ -294,7 +303,7 @@ function doViewPassage(surah, ayahStart, ayahEnd) {
     }
 
     currentSurah = surah;
-    updateSurahTitle();
+    updateCurrentSurah();
     window.enableAutoScroll = true;
 
     var resultPane = $('.resultsPane').empty();
@@ -304,7 +313,14 @@ function doViewPassage(surah, ayahStart, ayahEnd) {
     window.ayahEnd = ayahEnd || 50;
 }
 
-function updateSurahTitle() {
+function setCurrentSurah(surah) {
+    surahSelector.val(surah);
+    surahSelector.selectmenu('refresh');
+    currentSurah = surah;
+}
+
+function updateCurrentSurah() {
+    setCurrentSurah(currentSurah);
     if (currentSurah > 0 && surahList.length > 0) {
         var surah = surahList[currentSurah - 1];
         var title = surahTitleTemplate(surah);
@@ -339,7 +355,7 @@ function loadVerses(surah, start, end, animate) {
 
 var lastPlayer;
 function pausePreviousAudio(e) {
-    var self = e.target;
+    var self = e.currentTarget;
     if (lastPlayer) {
         if (lastPlayer.pause) {
             lastPlayer.pause();
@@ -362,12 +378,12 @@ function loadResults(data, animate) {
 }
 
 function onSurahChanged() {
-    var surah = $('#surahSelect').val();
+    var surah = surahSelector.val();
     changeSurah(surah);
 }
 
 function changeSurah(surah) {
-    if (currentSurah == surah) {
+    if (surah == 0 || currentSurah == surah) {
         return;
     }
 
