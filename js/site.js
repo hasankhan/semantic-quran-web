@@ -1,4 +1,5 @@
 var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHbuHsfhRmylXmwQgOKAsnmUyKG49'),
+    verseNumPattern = /^(\d{1,3})(?:$|[ :/](\d{1,3})(?:$|-(\d{1,3})$))/,
     tagsRecentlyAdded = [],
     resultTemplate,
     tagListTemplate,
@@ -9,7 +10,8 @@ var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHb
     mainView,
     currentSurah,
     mainPageHeading,
-    surahList = [];
+    surahList = [],
+    nameSurahMap = {};
 
 // Prevents all anchor click handling
 $.mobile.linkBindingEnabled = false;
@@ -20,7 +22,7 @@ $.mobile.hashListeningEnabled = false;
 var Workspace = Backbone.Router.extend({
     routes: {
         '': 'home',
-        'search/:tag': 'search',
+        'search/:term': 'search',
         ':surah/:start-:end': 'viewPassage',
         ':surah/:start': 'viewPassage',
         ':surah': 'viewPassage'
@@ -191,6 +193,11 @@ $(function () {
     client.listSurahs()
             .done(function (result) {
                 surahList = result || [];
+                surahList.forEach(function (surah) {
+                    nameSurahMap[surah.name.arabic.toLowerCase()] = surah.id;
+                    nameSurahMap[surah.name.english.toLowerCase()] = surah.id;
+                    nameSurahMap[surah.name.simple.toLowerCase()] = surah.id;
+                });
                 updateSurahTitle();
                 surahSelector.html(surahListTemplate({ surahs: surahList }));
             });
@@ -252,12 +259,22 @@ function updateRecentlyAddedTags() {
     }
 }
 
-function onSearch(tag) {
-    router.navigate('search/' + tag, { trigger: false });
-    doSearch(tag);
+function onSearch(term) {
+    router.navigate('search/' + term, { trigger: false });
+    doSearch(term);
 }
 
 function doSearch(val) {
+    var match = verseNumPattern.exec(val);
+    if (match) {
+        return doViewPassage(match[1], match[2], match[3]);
+    }
+
+    var surah = nameSurahMap[val.toLowerCase()];
+    if (surah) {
+        return doViewPassage(surah);
+    }
+
     updateTitle('tag: ' + val);
     currentSurah = 0;
     window.enableAutoScroll = false;
