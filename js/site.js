@@ -62,11 +62,23 @@ var MainView = Backbone.View.extend({
         this.searchBox = $('#search');
         this.addTagPanel = $('#addTagPanel');
         this.addTagForm = $('#addTagForm');
+        this.loginRow = $('#loginRow');
+        var self = this;
 
         updateMRU();
         if (client.canLogin) {
-            $('#loginRow').removeClass('hidden');
+            this.loginRow.removeClass('hidden');
+            Mousetrap.bind('l', this.login.bind(this));
         }
+
+        Mousetrap.bind('/', function () {
+            self.searchBox.focus();
+            return false;
+        });
+
+        Mousetrap.bind('alt', function () {
+            self.navPanel.panel('open');
+        });
     },
 
     onAddTagFormSubmit: function (e) {
@@ -154,7 +166,7 @@ var MainView = Backbone.View.extend({
     login: function (e) {
         var self = this;
         client.login('facebook').done(function () {
-            $(e.target).hide();
+            self.loginRow.hide();
             self.$el.addClass('loggedin');
         }, function (err) {
             alert('Error: ' + err);
