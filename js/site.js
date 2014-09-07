@@ -77,8 +77,8 @@ var MainView = Backbone.View.extend({
             self.searchBox.focus();
             return false;
         });
-        Mousetrap.bind('alt', function () {
-            self.navPanel.panel('open');
+        Mousetrap.bind('q', function () {
+            self.navPanel.panel('toggle');
         });
         Mousetrap.bind('l', this.login.bind(this));
         Mousetrap.bind('t', this.onAddTagClick.bind(this, null));
