@@ -72,7 +72,7 @@
         </div>
         <div data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay" id="addTagPanel" data-theme="a">
             <form id="addTagForm">
-                <h3>Please contribute a thoughtful tag for this ayah.</h3>
+                <h3>Please contribute a thoughtful tag for ayah <span id="addTagRef"></span></h3>
                 <label for="tagName">Tag</label>
                 <input type="text" name="tagName" value="" id="addTagDialogTextBox"
                        data-clear-btn="true" data-mini="true"
@@ -118,7 +118,7 @@
     </script>
     <script type="text/template" id="result_template">
         <% data.forEach(function(row){ %>
-        <div class="result">
+        <div class="result" data-surah="<%= row.surah %>" data-verse="<%= row.verse %>">
             <div class="ayahWrapper">
                 <div class="ayahRef">[<span data-surah="<%= row.surah %>" class="surahRef"><%= row.surah %></span>:<%= row.verse %>]</div>
                 <div class="ayah"><%= row.quran.text %></div>

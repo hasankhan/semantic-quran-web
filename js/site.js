@@ -54,7 +54,8 @@ var MainView = Backbone.View.extend({
         'click #addTagDialogButton': 'onAddTagFormSubmit',
         'click .tag': 'onTagClick',
         'click span.delete': 'onDelTagClick',
-        'click .addTag': 'onAddTagClick'
+        'click .addTag': 'onAddTagClick',
+        'mousemove .result': 'setCurrentVerse'
     },
 
     initialize: function () {
@@ -79,6 +80,13 @@ var MainView = Backbone.View.extend({
         Mousetrap.bind('alt', function () {
             self.navPanel.panel('open');
         });
+
+        Mousetrap.bind('t', this.onAddTagClick.bind(this, null));
+    },
+
+    setCurrentVerse: function (e) {
+        var result = $(e.target).closest('.result').data();
+        this.currentVerse = result;
     },
 
     onAddTagFormSubmit: function (e) {
@@ -113,11 +121,18 @@ var MainView = Backbone.View.extend({
     },
 
     onAddTagClick: function (e) {
-        var data = $(e.currentTarget).data();
+        var data = this.currentVerse;
+        if (!data && e && e.currentTarget) {
+            data = $(e.currentTarget).data();
+        }
+
+        if (!data || !data.surah || !data.verse) {
+            return;
+        }
 
         this.addTagForm.data('surah', data.surah);
         this.addTagForm.data('verse', data.verse);
-
+        $('#addTagRef').text(data.surah + ':' + data.verse);
         var textBox = $('#addTagDialogTextBox').val('');
 
         this.addTagPanel.panel('open');
@@ -218,7 +233,7 @@ $(function () {
                     nameSurahMap[surah.name.arabic.toLowerCase()] = surah.id;
                     nameSurahMap[surah.name.english.toLowerCase()] = surah.id;
                     nameSurahMap[surah.name.simple.toLowerCase()] = surah.id;
-                });                
+                });
                 surahSelector.append(surahListTemplate({ surahs: surahList }));
                 updateCurrentSurah();
             });
