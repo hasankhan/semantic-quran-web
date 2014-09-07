@@ -325,7 +325,7 @@ function doSearch(val) {
 }
 
 function doViewPassage(surah, ayahStart, ayahEnd) {
-    if (surahList.length > 0 && surah >= surahList.length) {
+    if (surahList.length > 0 && surah > surahList.length) {
         return;
     }
 
