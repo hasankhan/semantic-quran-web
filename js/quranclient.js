@@ -10,6 +10,12 @@ var QuranClient = (function () {
             this.client = new WindowsAzure.MobileServiceClient(host, key);
             this.canLogin = true;
         }
+
+        Object.defineProperty(this, 'loggedIn', {
+            get: function () {
+                return this.client.currentUser != null;
+            }
+        });
     }
 
     QuranClient.prototype.addTag = function (surah, verse, tag) {
