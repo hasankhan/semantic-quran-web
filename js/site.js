@@ -117,8 +117,6 @@ var MainView = Backbone.View.extend({
                     surahList = result || [];
                     surahList.forEach(function (surah) {
                         nameSurahMap[surah.name.arabic.toLowerCase()] = surah.id;
-                        nameSurahMap[surah.name.english.toLowerCase()] = surah.id;
-                        nameSurahMap[surah.name.simple.toLowerCase()] = surah.id;
                     });
                     surahSelector.append(surahListTemplate({ surahs: surahList }));
                     updateCurrentSurah();
