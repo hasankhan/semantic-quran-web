@@ -7,6 +7,7 @@ var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHb
     surahSelector,
     surahTitleTemplate,
     resultPane,
+    preText,
     router,
     appView,
     currentSurah,
@@ -235,9 +236,10 @@ $(function () {
     verseTagTemplate = _.template($('#verse_tag_template').html());
     tagListTemplate = _.template($('#tag_list_template').html());
     surahTitleTemplate = _.template($('#surah_title_template').html());
-    resultPane = $('.resultsPane');
+    resultPane = $('#resultsPane');
     mainPageHeading = $('#mainPageHeading');
     surahSelector = $('#surahSelect');
+    preText = $('#preText');
 
     appView = new AppView(client);
     router = new Workspace();
@@ -357,7 +359,7 @@ function doSearch(val) {
     window.enableAutoScroll = false;
 
     console.log('Doing search for: ' + val);
-    var resultPane = $('.resultsPane').empty();
+    resultPane.empty();
 
     client.findVersesByTag(val)
                 .done(function (result) {
@@ -374,7 +376,7 @@ function doViewPassage(surah, ayahStart, ayahEnd) {
     updateCurrentSurah();
     window.enableAutoScroll = true;
 
-    var resultPane = $('.resultsPane').empty();
+    resultPane.empty();
     loadVerses(surah, ayahStart, ayahEnd, true);
 
     window.ayahStart = ayahStart || 1;
@@ -382,6 +384,13 @@ function doViewPassage(surah, ayahStart, ayahEnd) {
 }
 
 function setCurrentSurah(surah) {
+    if (surah > 0 && surahList.length > 0 && surahList[surah - 1].bismillah_pre) {
+        preText.show();
+    }
+    else {
+        preText.hide();
+    }
+
     surahSelector.val(surah);
     surahSelector.selectmenu('refresh');
     currentSurah = surah;
