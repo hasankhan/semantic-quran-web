@@ -48,14 +48,15 @@ var MainView = Backbone.View.extend({
 
     events: {
         'click #menuBtn': 'toggleMenu',
-        'click .surahRef': 'changeSurah',
+        'click .surahRef': 'onSurahClick',
         'click #loginBtn': 'login',
         'submit #searchForm': 'onSearchSubmit',
         'submit #addTagForm': 'onAddTagFormSubmit',
         'click #addTagDialogButton': 'onAddTagFormSubmit',
         'click .tag': 'onTagClick',
         'click span.delete': 'onDelTagClick',
-        'click .addTag': 'onAddTagClick'
+        'click .addTag': 'onAddTagClick',
+        'click .recentTag': 'onRecentTagClick'
     },
 
     initialize: function (client) {
@@ -67,12 +68,28 @@ var MainView = Backbone.View.extend({
         this.client = client;
         this.lastAddedTags = '';
 
-        var self = this;
-
         updateMRU();
         if (client.canLogin) {
             this.loginRow.removeClass('hidden');
         }
+
+        this.bindShortcuts();
+        this.loadSurahs();        
+    },
+
+    onRecentTagClick: function(e) {
+        var $this = $(e.currentTarget);
+        var $textBox = $('#addTagDialogTextBox');
+        var val = $('.tagName', $this).text();
+        var existing = $textBox.val();
+        if (existing) {
+            val = existing + ',' + val;
+        }
+        $textBox.val(val);
+    },
+
+    bindShortcuts: function () {
+        var self = this;
 
         Mousetrap.bind('/', function () {
             self.searchBox.focus();
@@ -85,6 +102,36 @@ var MainView = Backbone.View.extend({
         Mousetrap.bind('t', this.onAddTagClick.bind(this, null));
         Mousetrap.bind('d', this.onDelTagClick.bind(this, null));
         Mousetrap.bind('r', this.onRepeatLastTags.bind(this));
+    },
+
+    loadSurahs: function () {
+        var self = this;
+
+        var surahListTemplate = _.template($('#surah_list_template').html());
+        surahSelector.change(function () {
+            var surah = surahSelector.val();
+            self.changeSurah(surah);
+        });
+        this.client.listSurahs()
+                .done(function (result) {
+                    surahList = result || [];
+                    surahList.forEach(function (surah) {
+                        nameSurahMap[surah.name.arabic.toLowerCase()] = surah.id;
+                        nameSurahMap[surah.name.english.toLowerCase()] = surah.id;
+                        nameSurahMap[surah.name.simple.toLowerCase()] = surah.id;
+                    });
+                    surahSelector.append(surahListTemplate({ surahs: surahList }));
+                    updateCurrentSurah();
+                });
+    },
+
+    changeSurah: function(surah) {
+        if (surah == 0 || currentSurah == surah) {
+            return;
+        }
+
+        router.navigate(surah.toString(), { trigger: false });
+        doViewPassage(surah);
     },
 
     onAddTagFormSubmit: function (e) {
@@ -102,12 +149,13 @@ var MainView = Backbone.View.extend({
     },
 
     addTags: function (surah, verse, tags) {
+        var self = this;
         this.lastAddedTags = tags;
 
         if (tags != null && tags.length > 0) {
             var values = tags.split(/[,;]/);
             $.each(values, function (i, value) {
-                doAddTag(value, surah, verse).done(function (result) {
+                self.addTag(value, surah, verse).done(function (result) {
                     console.log('Successfully Added: ' + result.text);
 
                     // Update the local row
@@ -121,6 +169,27 @@ var MainView = Backbone.View.extend({
                 });
             });
         }
+    },
+
+    addTag: function (val, surahNum, verseNum) {
+        console.log('Adding tag: ' + val + ' to ' + '[' + surahNum + ':' + verseNum + ']');
+
+        // Add the tag to our recently added tags
+        var isInList = false;
+        $.each(tagsRecentlyAdded, function (i, entry) {
+            if (entry === val) {
+                isInList = true;
+                return false;
+            }
+        });
+
+        if (!isInList) {
+            tagsRecentlyAdded.unshift(val);
+            tagsRecentlyAdded = tagsRecentlyAdded.slice(0, 10);
+            updateRecentlyAddedTags();
+        }
+
+        return this.client.addTag(surahNum, verseNum, val);
     },
 
     onRepeatLastTags: function (e) {
@@ -183,9 +252,18 @@ var MainView = Backbone.View.extend({
         }
 
         var parent = tagEl.remove();
-        doDeleteTag(data.tag, data.surah, data.verse);
+        this.deleteTag(data.tag, data.surah, data.verse);
 
         return false;
+    },
+
+    deleteTag: function (val, surahNum, verseNum) {
+        console.log('Deleting tag: ' + val + ' to ' + '[' + surahNum + ':' + verseNum + ']');
+
+        this.client.removeTag(surahNum, verseNum, val)
+                .done(function () {
+                    console.log('Successfully Deleted')
+                });
     },
 
     onTagClick: function (e) {
@@ -210,10 +288,10 @@ var MainView = Backbone.View.extend({
         this.navPanel.panel('toggle');
     },
 
-    changeSurah: function (e) {
+    onSurahClick: function (e) {
         var surahRef = $(e.currentTarget);
         var surah = surahRef.data('surah');
-        setTimeout(changeSurah.bind(null, surah), 1);
+        setTimeout(this.changeSurah.bind(this, surah), 1);
     },
 
     login: function (e) {
@@ -251,70 +329,15 @@ $(function () {
         }
     });
 
-    $('#recentlyAddedTags').on('click', '.recentTag', function () {
-        var $this = $(this);
-        var $textBox = $('#addTagDialogTextBox');
-        var val = $('.tagName', $this).text();
-        var existing = $textBox.val();
-        if (existing) {
-            val = existing + ',' + val;
-        }
-        $textBox.val(val);
-    });
-
     if (Modernizr.localStorage && localStorage.tagsRecentlyAdded) {
         tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
         updateRecentlyAddedTags();
     }
-
-    var surahListTemplate = _.template($('#surah_list_template').html());
-    surahSelector.change(onSurahChanged);
-    client.listSurahs()
-            .done(function (result) {
-                surahList = result || [];
-                surahList.forEach(function (surah) {
-                    nameSurahMap[surah.name.arabic.toLowerCase()] = surah.id;
-                    nameSurahMap[surah.name.english.toLowerCase()] = surah.id;
-                    nameSurahMap[surah.name.simple.toLowerCase()] = surah.id;
-                });
-                surahSelector.append(surahListTemplate({ surahs: surahList }));
-                updateCurrentSurah();
-            });
 });
 
 client.onLoading = function (loading) {
     $.mobile.loading(loading ? 'show' : 'hide');
 };
-
-function doAddTag(val, surahNum, verseNum) {
-    console.log('Adding tag: ' + val + ' to ' + '[' + surahNum + ':' + verseNum + ']');
-
-    // Add the tag to our recently added tags
-    var isInList = false;
-    $.each(tagsRecentlyAdded, function (i, entry) {
-        if (entry === val) {
-            isInList = true;
-            return false;
-        }
-    });
-
-    if (!isInList) {
-        tagsRecentlyAdded.unshift(val);
-        tagsRecentlyAdded = tagsRecentlyAdded.slice(0, 10);
-        updateRecentlyAddedTags();
-    }
-
-    return client.addTag(surahNum, verseNum, val);
-}
-
-function doDeleteTag(val, surahNum, verseNum) {
-    console.log('Deleting tag: ' + val + ' to ' + '[' + surahNum + ':' + verseNum + ']');
-
-    client.removeTag(surahNum, verseNum, val)
-            .done(function () {
-                console.log('Successfully Deleted')
-            });
-}
 
 function updateMRU() {
     var lastUsedTags = $('#lastUsedTags');
@@ -354,7 +377,8 @@ function doSearch(val) {
         return doViewPassage(surah);
     }
 
-    updateTitle('tag: ' + val);
+    var title = 'tag: ' + val;
+    updateTitle(title);
     setCurrentSurah(0);
     window.enableAutoScroll = false;
 
@@ -363,6 +387,7 @@ function doSearch(val) {
 
     client.findVersesByTag(val)
                 .done(function (result) {
+                    updateTitle(title + ' - ' + result.length + ' results');
                     loadResults(result || [], true);
                 });
 }
@@ -452,18 +477,4 @@ function loadResults(data, animate) {
     if (animate) {
         window.scroll(0, 0);
     }
-}
-
-function onSurahChanged() {
-    var surah = surahSelector.val();
-    changeSurah(surah);
-}
-
-function changeSurah(surah) {
-    if (surah == 0 || currentSurah == surah) {
-        return;
-    }
-
-    router.navigate(surah.toString(), { trigger: false });
-    doViewPassage(surah);
 }
