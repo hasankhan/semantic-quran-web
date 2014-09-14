@@ -385,7 +385,7 @@ function doSearch(val) {
 
     client.findVersesByTag(val)
                 .done(function (result) {
-                    updateTitle(title + ' - ' + result.length + ' results');
+                    updateTitle(title + ' - ' + result.length + ' result(s)');
                     loadResults(result || [], true);
                 });
 }
