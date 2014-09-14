@@ -2,6 +2,11 @@
     display: none !important;
 }
 
+h1 a {
+    text-decoration:none;
+    color: inherit !important;
+}
+
 .result {    
     background-color: beige;
     border: 1px solid black;
