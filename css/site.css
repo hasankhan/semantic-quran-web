@@ -2,8 +2,9 @@
     display: none !important;
 }
 
-h1 a {
+h1 a, .ayahRef a {
     text-decoration:none;
+    font: inherit !important;
     color: inherit !important;
 }
 

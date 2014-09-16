@@ -29,9 +29,9 @@
         </div>
         <div data-role="content" class="results">
             <div id="preText" class="result">
-                <div class="ayahWrapper">                    
+                <div class="ayahWrapper">
                     <div class="ayah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-                </div>                                
+                </div>
                 <div class="clear"></div>
             </div>
             <div id="resultsPane">
@@ -125,7 +125,7 @@
         <% data.forEach(function(row){ %>
         <div class="result" data-surah="<%= row.surah %>" data-verse="<%= row.verse %>">
             <div class="ayahWrapper">
-                <div class="ayahRef">[<span data-surah="<%= row.surah %>" class="surahRef"><%= row.surah %></span>:<%= row.verse %>]</div>
+                <div class="ayahRef">[<a href="#<%= row.surah %>"><%= row.surah %></a>:<a href="#<%= row.surah %>/<%= row.verse %>"><%= row.verse %></a>]</div>
                 <div class="ayah"><%= row.quran.text %></div>
                 <div class="translation"><%= row.content[0].text %></div>
             </div>

@@ -49,7 +49,6 @@ var MainView = Backbone.View.extend({
 
     events: {
         'click #menuBtn': 'toggleMenu',
-        'click .surahRef': 'onSurahClick',
         'click #loginBtn': 'login',
         'submit #searchForm': 'onSearchSubmit',
         'submit #addTagForm': 'onAddTagFormSubmit',
@@ -319,12 +318,6 @@ var MainView = Backbone.View.extend({
 
     toggleMenu: function () {
         this.navPanel.panel('toggle');
-    },
-
-    onSurahClick: function (e) {
-        var surahRef = $(e.currentTarget);
-        var surah = surahRef.data('surah');
-        setTimeout(this.changeSurah.bind(this, surah), 1);
     },
 
     login: function (e) {
