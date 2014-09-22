@@ -24,23 +24,25 @@ $.mobile.hashListeningEnabled = false;
 
 var Workspace = Backbone.Router.extend({
     routes: {
-        '': 'home',
-        'search/:term': 'search',
+        '': 'viewPassage',
         ':surah/:start-:end': 'viewPassage',
         ':surah/:start': 'viewPassage',
-        ':surah': 'viewPassage'
+        ':surah': 'viewPassage',
+        'search/:term': 'search',
     },
 
-    home: doViewPassage.bind(this, 1),
-    viewPassage: doViewPassage.bind(this),
+    viewPassage: function (surah, start, end) {
+        appView.mainView.doViewPassage(surah || 1, start, end);
+    },
+
     search: doSearch.bind(this)
 });
 
 var AppView = Backbone.View.extend({
     el: $('body'),
 
-    initialize: function (client) {
-        this.mainView = new MainView(client);
+    initialize: function (client, router) {
+        this.mainView = new MainView(client, router);                
     }
 });
 
@@ -59,13 +61,14 @@ var MainView = Backbone.View.extend({
         'click .recentTag': 'onRecentTagClick'
     },
 
-    initialize: function (client) {
+    initialize: function (client, router) {
         this.navPanel = $('#nav-panel');
         this.searchBox = $('#search');
         this.addTagPanel = $('#addTagPanel');
         this.addTagForm = $('#addTagForm');
         this.loginRow = $('#loginRow');
         this.client = client;
+        this.router = router;
         this.lastAddedTags = '';
 
         updateMRU();
@@ -162,8 +165,24 @@ var MainView = Backbone.View.extend({
             return;
         }
 
-        router.navigate(surah.toString(), { trigger: false });
-        doViewPassage(surah);
+        this.router.navigate(surah.toString(), { trigger: false });
+        this.doViewPassage(surah);
+    },
+
+    doViewPassage: function(surah, ayahStart, ayahEnd) {
+        if (surahList.length > 0 && surah > surahList.length) {
+            return;
+        }
+
+        currentSurah = surah;
+        updateCurrentSurah();
+        window.enableAutoScroll = true;
+
+        resultPane.empty();
+        loadVerses(surah, ayahStart, ayahEnd, true);
+
+        window.ayahStart = ayahStart || 1;
+        window.ayahEnd = ayahEnd || 50;
     },
 
     onAddTagFormSubmit: function (e) {
@@ -345,8 +364,8 @@ $(function () {
     surahSelector = $('#surahSelect');
     preText = $('#preText');
 
-    appView = new AppView(client);
     router = new Workspace();
+    appView = new AppView(client, router);
     Backbone.history.start();
 
     if (Modernizr.localStorage && localStorage.tagsRecentlyAdded) {
@@ -389,12 +408,12 @@ function onSearch(term) {
 function doSearch(val) {
     var match = verseNumPattern.exec(val);
     if (match) {
-        return doViewPassage(match[1], match[2], match[3]);
+        return appView.mainView.doViewPassage(match[1], match[2], match[3]);
     }
 
     var surah = nameSurahMap[val.toLowerCase()];
     if (surah) {
-        return doViewPassage(surah);
+        return appView.mainView.doViewPassage(surah);
     }
 
     var title = 'tag: ' + val;
@@ -406,26 +425,10 @@ function doSearch(val) {
     resultPane.empty();
 
     client.findVersesByTag(val)
-                .done(function (result) {
-                    updateTitle(title + ' - ' + result.length + ' result(s)');
-                    loadResults(result || [], true);
-                });
-}
-
-function doViewPassage(surah, ayahStart, ayahEnd) {
-    if (surahList.length > 0 && surah > surahList.length) {
-        return;
-    }
-
-    currentSurah = surah;
-    updateCurrentSurah();
-    window.enableAutoScroll = true;
-
-    resultPane.empty();
-    loadVerses(surah, ayahStart, ayahEnd, true);
-
-    window.ayahStart = ayahStart || 1;
-    window.ayahEnd = ayahEnd || 50;
+        .done(function (result) {
+            updateTitle(title + ' - ' + result.length + ' result(s)');
+            loadResults(result || [], true);
+        });
 }
 
 function setCurrentSurah(surah) {
