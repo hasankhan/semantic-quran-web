@@ -25,10 +25,10 @@ $.mobile.hashListeningEnabled = false;
 var Workspace = Backbone.Router.extend({
     routes: {
         '': 'viewPassage',
+        'search/:term': 'search',
         ':surah/:start-:end': 'viewPassage',
         ':surah/:start': 'viewPassage',
         ':surah': 'viewPassage',
-        'search/:term': 'search',
     },
 
     viewPassage: function (surah, start, end) {
@@ -55,7 +55,6 @@ var MainView = Backbone.View.extend({
         'submit #searchForm': 'onSearchSubmit',
         'submit #addTagForm': 'onAddTagFormSubmit',
         'click #addTagDialogButton': 'onAddTagFormSubmit',
-        'click .tag': 'onTagClick',
         'click span.delete': 'onDelTagClick',
         'click .addTag': 'onAddTagClick',
         'click .recentTag': 'onRecentTagClick'
@@ -315,15 +314,7 @@ var MainView = Backbone.View.extend({
                 .done(function () {
                     console.log('Successfully Deleted')
                 });
-    },
-
-    onTagClick: function (e) {
-        var tagEl = $(e.currentTarget);
-        if (!tagEl.hasClass('addTag') && !tagEl.hasClass('recentTag')) {
-            var tag = tagEl.data('tag');
-            onSearch(tag);
-        }
-    },
+    },    
 
     onSearchSubmit: function () {
         var val = this.searchBox.val();

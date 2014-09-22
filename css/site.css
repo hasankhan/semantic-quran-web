@@ -2,7 +2,7 @@
     display: none !important;
 }
 
-h1 a, .ayahRef a {
+h1 a, .ayahRef a, .tag a {
     text-decoration:none;
     font: inherit !important;
     color: inherit !important;
@@ -40,20 +40,25 @@ h1 a, .ayahRef a {
 
 li.tag {
     float: left;
-    width: 86px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     display: inline-block;
     list-style-type: none;
     border: 1px solid gray;
     border-radius: 10px;
     background-color: beige;
-    cursor: pointer;
-    padding: 5px;
     margin: 1px;
     font-size: 10px;
     text-align: center;
+}
+
+li.tag a, li.addTag {
+    display: inline-block;
+    width: 86px;
+    padding: 5px;
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
 }
 
 .loggedin-action {
@@ -67,6 +72,7 @@ li.tag {
 li.addTag {
     background-color: lightgreen;
     display: none;
+    cursor: pointer;
 }
 
 .loggedin li.addTag {
@@ -74,8 +80,9 @@ li.addTag {
 }
 
 span.delete {
-    padding-left: 5px;
+    margin-right: 5px;
     color: red;
+    cursor: pointer;
 }
 
 .loggedin span.delete {

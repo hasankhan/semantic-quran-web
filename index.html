@@ -55,17 +55,17 @@
                 <li data-filtertext="wai-aria">
                     <h3>Suggested Tags</h3>
                     <ul>
-                        <li class="tag" data-tag="marriage">
-                            <span class="tagName">marriage</span>
+                        <li class="tag">
+                            <a href="#search/marriage">marriage</a>
                         </li>
-                        <li class="tag" data-tag="dua">
-                            <span class="tagName">dua</span>
+                        <li class="tag">
+                            <a href="#search/dua">dua</a>
                         </li>
-                        <li class="tag" data-tag="heaven">
-                            <span class="tagName">heaven</span>
+                        <li class="tag">
+                            <a href="#search/heaven">heaven</a>
                         </li>
-                        <li class="tag" data-tag="hell">
-                            <span class="tagName">hell</span>
+                        <li class="tag">
+                            <a href="#search/hell">hell</a>
                         </li>
                     </ul>
                 </li>
@@ -111,13 +111,13 @@
     <script type="text/template" id="tag_list_template">
         <% tags.forEach(function(tag) { %>
         <li class="tag <%= classes %>" data-tag="<%= tag %>">
-            <span class="tagName"><%= tag %></span>
+            <a href="#search/<%= tag %>"><%= tag %></a>
         </li>
         <% }); %>
     </script>
     <script type="text/template" id="verse_tag_template">
         <li class="tag" data-tag="<%= tag %>" data-surah="<%= surah %>" data-verse="<%= verse %>">
-            <span class="tagName"><%= tag %></span>
+            <a href="#search/<%= tag %>"><%= tag %></a>
             <span class="delete loggedin-action">X</span>
         </li>
     </script>
