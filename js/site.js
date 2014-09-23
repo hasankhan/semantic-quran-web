@@ -6,6 +6,7 @@ var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHb
     verseTagTemplate,
     surahSelector,
     surahTitleTemplate,
+    addTagDialogTextBox,
     resultPane,
     preText,
     router,
@@ -100,14 +101,13 @@ var MainView = Backbone.View.extend({
     },
 
     onRecentTagClick: function(e) {
-        var $this = $(e.currentTarget);
-        var $textBox = $('#addTagDialogTextBox');
-        var val = $('.tagName', $this).text();
-        var existing = $textBox.val();
+        var tag = $(e.currentTarget).data('tag');
+        var existing = addTagDialogTextBox.val();
         if (existing) {
-            val = existing + ',' + val;
+            tag = existing + ',' + tag;
         }
-        $textBox.val(val);
+        addTagDialogTextBox.val(tag);
+        return false;
     },
 
     bindShortcuts: function () {
@@ -186,11 +186,10 @@ var MainView = Backbone.View.extend({
 
     onAddTagFormSubmit: function (e) {
         var data = this.addTagForm.data();
-        var $textBox = $('#addTagDialogTextBox');
-        var tags = $textBox.val();
+        var tags = addTagDialogTextBox.val();
         var surahNum = data.surah;
         var verseNum = data.verse;
-        $textBox.val('');
+        addTagDialogTextBox.val('');
 
         this.addTags(surahNum, verseNum, tags);
 
@@ -277,7 +276,7 @@ var MainView = Backbone.View.extend({
         this.addTagForm.data('surah', data.surah);
         this.addTagForm.data('verse', data.verse);
         $('#addTagRef').text(data.surah + ':' + data.verse);
-        var textBox = $('#addTagDialogTextBox').val('');
+        var textBox = addTagDialogTextBox.val('');
 
         this.addTagPanel.panel('open');
         setTimeout(function () {
@@ -354,12 +353,13 @@ $(function () {
     mainPageHeading = $('#mainPageHeading');
     surahSelector = $('#surahSelect');
     preText = $('#preText');
+    addTagDialogTextBox = $('#addTagDialogTextBox');
 
     router = new Workspace();
     appView = new AppView(client, router);
     Backbone.history.start();
 
-    if (Modernizr.localStorage && localStorage.tagsRecentlyAdded) {
+    if (Modernizr.localstorage && localStorage.tagsRecentlyAdded) {
         tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
         updateRecentlyAddedTags();
     }
@@ -386,7 +386,7 @@ function updateRecentlyAddedTags() {
         classes: 'recentTag'
     }));
 
-    if (Modernizr.localStorage) {
+    if (Modernizr.localstorage) {
         localStorage.tagsRecentlyAdded = JSON.stringify(tagsRecentlyAdded);
     }
 }
