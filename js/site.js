@@ -71,7 +71,11 @@ var MainView = Backbone.View.extend({
         this.router = router;
         this.lastAddedTags = '';
 
-        updateMRU();
+        this.client.onLoading = function (loading) {
+            $.mobile.loading(loading ? 'show' : 'hide');
+        };
+        this.updateMRU();
+        this.loadRecentTags();
         if (client.canLogin) {
             this.loginRow.removeClass('hidden');
         }
@@ -85,6 +89,29 @@ var MainView = Backbone.View.extend({
                 self.scrollMore();
             }
         });
+    },
+
+    loadRecentTags: function() {
+        if (Modernizr.localstorage && localStorage.tagsRecentlyAdded) {
+            tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
+            var container = $('#recentlyAddedTags').html(tagListTemplate({
+                tags: tagsRecentlyAdded,
+                classes: 'recentTag'
+            }));
+
+            localStorage.tagsRecentlyAdded = JSON.stringify(tagsRecentlyAdded);
+        }
+    },
+
+    updateMRU: function() {
+        var lastUsedTags = $('#lastUsedTags');
+        client.listTags()
+              .done(function (tags) {
+                  lastUsedTags.html(tagListTemplate({
+                      tags: tags,
+                      classes: ''
+                  }));
+              });
     },
 
     scrollMore: function() {
@@ -357,39 +384,8 @@ $(function () {
 
     router = new Workspace();
     appView = new AppView(client, router);
-    Backbone.history.start();
-
-    if (Modernizr.localstorage && localStorage.tagsRecentlyAdded) {
-        tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
-        updateRecentlyAddedTags();
-    }
+    Backbone.history.start();    
 });
-
-client.onLoading = function (loading) {
-    $.mobile.loading(loading ? 'show' : 'hide');
-};
-
-function updateMRU() {
-    var lastUsedTags = $('#lastUsedTags');
-    client.listTags()
-          .done(function (tags) {
-              lastUsedTags.html(tagListTemplate({
-                  tags: tags,
-                  classes: ''
-              }));
-          });
-}
-
-function updateRecentlyAddedTags() {
-    var container = $('#recentlyAddedTags').html(tagListTemplate({
-        tags: tagsRecentlyAdded,
-        classes: 'recentTag'
-    }));
-
-    if (Modernizr.localstorage) {
-        localStorage.tagsRecentlyAdded = JSON.stringify(tagsRecentlyAdded);
-    }
-}
 
 function onSearch(term) {
     router.navigate('search/' + term, { trigger: false });
@@ -454,19 +450,6 @@ function loadVerses(surah, start, end, animate) {
                 .done(function (result) {
                     loadResults(result || [], animate);
                 });
-}
-
-var lastPlayer;
-function pausePreviousAudio(e) {
-    var self = e.currentTarget;
-    if (lastPlayer) {
-        if (lastPlayer.pause) {
-            lastPlayer.pause();
-        }
-        $(lastPlayer).css('width', '40px');
-    }
-    $(self).css('width', '200px');
-    lastPlayer = self;
 }
 
 function loadResults(data, animate) {
