@@ -262,7 +262,7 @@ var MainView = Backbone.View.extend({
         if (!isInList) {
             tagsRecentlyAdded.unshift(val);
             tagsRecentlyAdded = tagsRecentlyAdded.slice(0, 10);
-            updateRecentlyAddedTags();
+            this.loadRecentTags();
         }
 
         return this.client.addTag(surahNum, verseNum, val);
