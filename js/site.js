@@ -36,7 +36,9 @@ var Workspace = Backbone.Router.extend({
         appView.mainView.doViewPassage(surah || 1, start, end);
     },
 
-    search: doSearch.bind(this)
+    search: function (term) {
+        appView.mainView.doSearch(term);
+    }
 });
 
 var AppView = Backbone.View.extend({
@@ -124,7 +126,7 @@ var MainView = Backbone.View.extend({
 
         window.ayahStart += 50;
         window.ayahEnd = Math.min(window.ayahEnd + 50, surahList[currentSurah - 1].verses);
-        loadVerses(currentSurah, window.ayahStart, window.ayahEnd, false);
+        this.loadVerses(currentSurah, window.ayahStart, window.ayahEnd, false);
     },
 
     onRecentTagClick: function(e) {
@@ -205,7 +207,7 @@ var MainView = Backbone.View.extend({
         window.enableAutoScroll = true;
 
         resultPane.empty();
-        loadVerses(surah, ayahStart, ayahEnd, true);
+        this.loadVerses(surah, ayahStart, ayahEnd, true);
 
         window.ayahStart = ayahStart || 1;
         window.ayahEnd = ayahEnd || 50;
@@ -345,7 +347,7 @@ var MainView = Backbone.View.extend({
     onSearchSubmit: function () {
         var val = this.searchBox.val();
         if (val && val.length > 0) {
-            onSearch(val);
+            router.navigate('search/' + val, { trigger: true });
         }
         this.searchBox.val('');
 
@@ -368,6 +370,40 @@ var MainView = Backbone.View.extend({
         }, function (err) {
             alert('Error: ' + err);
         });
+    },
+
+    doSearch: function(val) {
+        var match = verseNumPattern.exec(val);
+        if (match) {
+            return this.doViewPassage(match[1], match[2], match[3]);
+        }
+
+        var surah = nameSurahMap[val.toLowerCase()];
+        if (surah) {
+            return this.doViewPassage(surah);
+        }
+
+        var title = 'tag: ' + val;
+        updateTitle(title);
+        setCurrentSurah(0);
+        window.enableAutoScroll = false;
+
+        console.log('Doing search for: ' + val);
+        resultPane.empty();
+
+        this.client.findVersesByTag(val)
+            .done(function (result) {
+                updateTitle(title + ' - ' + result.length + ' result(s)');
+                loadResults(result || [], true);
+            });
+    },
+
+    loadVerses: function(surah, start, end, animate) {
+        window.loading = true;
+        this.client.getVersesByRange(surah, start, end)
+                .done(function (result) {
+                    loadResults(result || [], animate);
+                });
     }
 });
 
@@ -386,37 +422,6 @@ $(function () {
     appView = new AppView(client, router);
     Backbone.history.start();    
 });
-
-function onSearch(term) {
-    router.navigate('search/' + term, { trigger: false });
-    doSearch(term);
-}
-
-function doSearch(val) {
-    var match = verseNumPattern.exec(val);
-    if (match) {
-        return appView.mainView.doViewPassage(match[1], match[2], match[3]);
-    }
-
-    var surah = nameSurahMap[val.toLowerCase()];
-    if (surah) {
-        return appView.mainView.doViewPassage(surah);
-    }
-
-    var title = 'tag: ' + val;
-    updateTitle(title);
-    setCurrentSurah(0);
-    window.enableAutoScroll = false;
-
-    console.log('Doing search for: ' + val);
-    resultPane.empty();
-
-    client.findVersesByTag(val)
-        .done(function (result) {
-            updateTitle(title + ' - ' + result.length + ' result(s)');
-            loadResults(result || [], true);
-        });
-}
 
 function setCurrentSurah(surah) {
     if (surah > 0 && surahList.length > 0 && surahList[surah - 1].bismillah_pre) {
@@ -442,14 +447,6 @@ function updateCurrentSurah() {
 
 function updateTitle(title) {
     mainPageHeading.text(title);
-}
-
-function loadVerses(surah, start, end, animate) {
-    window.loading = true;
-    client.getVersesByRange(surah, start, end)
-                .done(function (result) {
-                    loadResults(result || [], animate);
-                });
 }
 
 function loadResults(data, animate) {
