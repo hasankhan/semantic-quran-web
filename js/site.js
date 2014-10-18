@@ -408,7 +408,7 @@ var MainView = Backbone.View.extend({
                 });
     },
 
-    updatedCurrentSurah: function () {
+    updateCurrentSurah: function () {
         this.setCurrentSurah(currentSurah);
         if (currentSurah > 0 && surahList.length > 0) {
             var surah = surahList[currentSurah - 1];
