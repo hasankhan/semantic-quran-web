@@ -349,7 +349,7 @@ var MainView = Backbone.View.extend({
     onSearchSubmit: function () {
         var val = this.searchBox.val();
         if (val && val.length > 0) {
-            router.navigate('search/' + val, { trigger: true });
+            this.router.navigate('search/' + val, { trigger: true });
         }
         this.searchBox.val('');
 
