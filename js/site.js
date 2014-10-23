@@ -1,12 +1,7 @@
 var client = new QuranClient('https://semantic-quran.azure-mobile.net/', 'okajHbuHsfhRmylXmwQgOKAsnmUyKG49'),
     verseNumPattern = /^(\d{1,3})(?:$|[ :/](\d{1,3})(?:$|-(\d{1,3})$))/,
-    tagsRecentlyAdded = [],
-    router,
     appView,
-    currentSurah,
-    surahList = [],
-    LastSurah = 114,
-    nameSurahMap = {};
+    LastSurah = 114;
 
 // Prevents all anchor click handling
 $.mobile.linkBindingEnabled = false;
@@ -69,7 +64,9 @@ var MainView = Backbone.View.extend({
         this.surahSelector = $('#surahSelect');
         this.preText = $('#preText');
         this.addTagDialogTextBox = $('#addTagDialogTextBox');
-
+        this.tagsRecentlyAdded = [];
+        this.surahList = [];
+        this.nameSurahMap = {};
         this.client = client;
         this.router = router;
         this.lastAddedTags = '';
@@ -96,13 +93,13 @@ var MainView = Backbone.View.extend({
 
     loadRecentTags: function() {
         if (Modernizr.localstorage && localStorage.tagsRecentlyAdded) {
-            tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
+            this.tagsRecentlyAdded = JSON.parse(localStorage.tagsRecentlyAdded);
             var container = $('#recentlyAddedTags').html(this.tagListTemplate({
-                tags: tagsRecentlyAdded,
+                tags: this.tagsRecentlyAdded,
                 classes: 'recentTag'
             }));
 
-            localStorage.tagsRecentlyAdded = JSON.stringify(tagsRecentlyAdded);
+            localStorage.tagsRecentlyAdded = JSON.stringify(this.tagsRecentlyAdded);
         }
     },
 
@@ -120,15 +117,15 @@ var MainView = Backbone.View.extend({
 
     scrollMore: function() {
         if (!window.enableAutoScroll ||
-                currentSurah == 0 ||
-                surahList.length == 0 ||
-                window.ayahEnd >= surahList[currentSurah - 1].verses) {
+                this.currentSurah == 0 ||
+                this.surahList.length == 0 ||
+                window.ayahEnd >= this.surahList[this.currentSurah - 1].verses) {
             return;
         }
 
         window.ayahStart += 50;
-        window.ayahEnd = Math.min(window.ayahEnd + 50, surahList[currentSurah - 1].verses);
-        this.loadVerses(currentSurah, window.ayahStart, window.ayahEnd, false);
+        window.ayahEnd = Math.min(window.ayahEnd + 50, this.surahList[this.currentSurah - 1].verses);
+        this.loadVerses(this.currentSurah, window.ayahStart, window.ayahEnd, false);
     },
 
     onRecentTagClick: function(e) {
@@ -160,14 +157,14 @@ var MainView = Backbone.View.extend({
     },
 
     previousSurah: function() {
-        if (currentSurah > 1) {
-            this.changeSurah(currentSurah - 1);
+        if (this.currentSurah > 1) {
+            this.changeSurah(this.currentSurah - 1);
         }
     },
 
     nextSurah: function() {
-        if (currentSurah > 0 && currentSurah < LastSurah) {
-            this.changeSurah(currentSurah + 1);
+        if (this.currentSurah > 0 && this.currentSurah < LastSurah) {
+            this.changeSurah(this.currentSurah + 1);
         }
     },
 
@@ -181,17 +178,17 @@ var MainView = Backbone.View.extend({
         });
         this.client.listSurahs()
                 .done(function (result) {
-                    surahList = result || [];
-                    surahList.forEach(function (surah) {
-                        nameSurahMap[surah.name.arabic.toLowerCase()] = surah.id;
+                    self.surahList = result || [];
+                    self.surahList.forEach(function (surah) {
+                        self.nameSurahMap[surah.name.arabic.toLowerCase()] = surah.id;
                     });
-                    self.surahSelector.append(surahListTemplate({ surahs: surahList }));
+                    self.surahSelector.append(surahListTemplate({ surahs: self.surahList }));
                     self.updateCurrentSurah();
                 });
     },
 
     changeSurah: function(surah) {
-        if (surah == 0 || currentSurah == surah) {
+        if (surah == 0 || this.currentSurah == surah) {
             return;
         }
 
@@ -200,11 +197,11 @@ var MainView = Backbone.View.extend({
     },
 
     doViewPassage: function(surah, ayahStart, ayahEnd) {
-        if (surahList.length > 0 && surah > surahList.length) {
+        if (this.surahList.length > 0 && surah > this.surahList.length) {
             return;
         }
 
-        currentSurah = surah;
+        this.currentSurah = surah;
         this.updateCurrentSurah();
         window.enableAutoScroll = true;
 
@@ -256,7 +253,7 @@ var MainView = Backbone.View.extend({
 
         // Add the tag to our recently added tags
         var isInList = false;
-        $.each(tagsRecentlyAdded, function (i, entry) {
+        $.each(this.tagsRecentlyAdded, function (i, entry) {
             if (entry === val) {
                 isInList = true;
                 return false;
@@ -264,8 +261,8 @@ var MainView = Backbone.View.extend({
         });
 
         if (!isInList) {
-            tagsRecentlyAdded.unshift(val);
-            tagsRecentlyAdded = tagsRecentlyAdded.slice(0, 10);
+            this.tagsRecentlyAdded.unshift(val);
+            this.tagsRecentlyAdded = this.tagsRecentlyAdded.slice(0, 10);
             this.loadRecentTags();
         }
 
@@ -380,7 +377,7 @@ var MainView = Backbone.View.extend({
             return this.doViewPassage(match[1], match[2], match[3]);
         }
 
-        var surah = nameSurahMap[val.toLowerCase()];
+        var surah = this.nameSurahMap[val.toLowerCase()];
         if (surah) {
             return this.doViewPassage(surah);
         }
@@ -411,9 +408,9 @@ var MainView = Backbone.View.extend({
     },
 
     updateCurrentSurah: function () {
-        this.setCurrentSurah(currentSurah);
-        if (currentSurah > 0 && surahList.length > 0) {
-            var surah = surahList[currentSurah - 1];
+        this.setCurrentSurah(this.currentSurah);
+        if (this.currentSurah > 0 && this.surahList.length > 0) {
+            var surah = this.surahList[this.currentSurah - 1];
             var title = this.surahTitleTemplate(surah);
             this.updateTitle(title);
         }
@@ -435,7 +432,7 @@ var MainView = Backbone.View.extend({
     },
 
     setCurrentSurah: function(surah) {
-        if (surah > 0 && surahList.length > 0 && surahList[surah - 1].bismillah_pre) {
+        if (surah > 0 && this.surahList.length > 0 && this.surahList[surah - 1].bismillah_pre) {
             this.preText.show();
         }
         else {
@@ -444,7 +441,7 @@ var MainView = Backbone.View.extend({
 
         this.surahSelector.val(surah);
         this.surahSelector.selectmenu('refresh');
-        currentSurah = surah;
+        this.currentSurah = surah;
     }
 });
 
