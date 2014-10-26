@@ -116,16 +116,16 @@ var MainView = Backbone.View.extend({
     },
 
     scrollMore: function() {
-        if (!window.enableAutoScroll ||
+        if (!this.enableAutoScroll ||
                 this.currentSurah == 0 ||
                 this.surahList.length == 0 ||
-                window.ayahEnd >= this.surahList[this.currentSurah - 1].verses) {
+                this.ayahEnd >= this.surahList[this.currentSurah - 1].verses) {
             return;
         }
 
-        window.ayahStart += 50;
-        window.ayahEnd = Math.min(window.ayahEnd + 50, this.surahList[this.currentSurah - 1].verses);
-        this.loadVerses(this.currentSurah, window.ayahStart, window.ayahEnd, false);
+        this.ayahStart += 50;
+        this.ayahEnd = Math.min(this.ayahEnd + 50, this.surahList[this.currentSurah - 1].verses);
+        this.loadVerses(this.currentSurah, this.ayahStart, this.ayahEnd, false);
     },
 
     onRecentTagClick: function(e) {
@@ -203,13 +203,13 @@ var MainView = Backbone.View.extend({
 
         this.currentSurah = surah;
         this.updateCurrentSurah();
-        window.enableAutoScroll = true;
+        this.enableAutoScroll = true;
 
         this.resultPane.empty();
         this.loadVerses(surah, ayahStart, ayahEnd, true);
 
-        window.ayahStart = ayahStart || 1;
-        window.ayahEnd = ayahEnd || 50;
+        this.ayahStart = ayahStart || 1;
+        this.ayahEnd = ayahEnd || 50;
     },
 
     onAddTagFormSubmit: function (e) {
@@ -385,7 +385,7 @@ var MainView = Backbone.View.extend({
         var title = 'tag: ' + val;
         this.updateTitle(title);
         this.setCurrentSurah(0);
-        window.enableAutoScroll = false;
+        this.enableAutoScroll = false;
 
         console.log('Doing search for: ' + val);
         this.resultPane.empty();
@@ -399,7 +399,6 @@ var MainView = Backbone.View.extend({
     },
 
     loadVerses: function(surah, start, end, animate) {
-        window.loading = true;
         var self = this;
         this.client.getVersesByRange(surah, start, end)
                 .done(function (result) {
