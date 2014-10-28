@@ -364,7 +364,9 @@ var MainView = Backbone.View.extend({
 
         var self = this;
         client.login('facebook', {
-            display: 'popup'
+            parameters: {
+                display: 'popup'
+            }
         }).done(function () {
             self.loginRow.hide();
             self.$el.addClass('loggedin');
