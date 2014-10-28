@@ -13,9 +13,15 @@ var QuranClient = (function () {
 
         Object.defineProperty(this, 'loggedIn', {
             get: function () {
-                return this.client.currentUser != null;
+                return this.currentUser != null;
             }
         });
+
+        Object.defineProperty(this, 'currentUser', {
+            get: function () {
+                return this.client ? this.client.currentUser : null;
+            }
+        })
     }
 
     QuranClient.prototype.addTag = function (surah, verse, tag) {
@@ -51,9 +57,9 @@ var QuranClient = (function () {
         return this._get('tag');
     }
 
-    QuranClient.prototype.login = function (provider) {
+    QuranClient.prototype.login = function (provider, options) {
         if (this.client) {
-            return this.client.login(provider);
+            return this.client.loginWithOptions(provider, options);
         }
     };
 

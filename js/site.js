@@ -363,9 +363,14 @@ var MainView = Backbone.View.extend({
         }
 
         var self = this;
-        client.login('facebook').done(function () {
+        client.login('facebook', {
+            display: 'popup'
+        }).done(function () {
             self.loginRow.hide();
             self.$el.addClass('loggedin');
+            UserVoice.push(['identify', {
+                id: client.currentUser.userId
+            }]);
         }, function (err) {
             alert('Error: ' + err);
         });

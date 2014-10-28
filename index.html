@@ -41,12 +41,21 @@
             <select name="surahSelect" id="surahSelect" data-mini="true" data-inline="true">
                 <option value="0">Select Surah</option>
             </select>
-            <a class="ui-btn-right" data-iconpos="notext"
-               data-icon="info" target="_blank"
-               href="https://github.com/hasankhan/semantic-quran-web">
-                View source
-            </a>
-        </div>
+            <div class="ui-btn-right">
+                <a data-iconpos="notext"
+                   data-role="button"
+                   data-icon="comment" 
+                   id="feedback"
+                   href="javascript:void(0)">
+                    Feedback
+                </a>
+                <a data-iconpos="notext"
+                   data-role="button"
+                   data-icon="info" target="_blank"
+                   href="https://github.com/hasankhan/semantic-quran-web">
+                    View source
+                </a>
+            </div>
         <div data-role="panel" data-position="left" data-position-fixed="true" data-display="overlay" id="nav-panel">
             <ul data-role="listview" style="margin-top:-16px;" class="nav-search">
                 <li data-filtertext="wai-aria" id="loginRow" class="hidden">
@@ -95,7 +104,7 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
-    <script src="http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.1.2.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.2.5.min.js"></script>
     <script type="text/javascript" src="js/quranclient.js"></script>
     <script type="text/javascript" src="js/modernizr.js"></script>
     <script type="text/javascript" src="js/mousetrap.min.js"></script>
@@ -145,6 +154,16 @@
             <div class="clear"></div>
         </div>
         <% }); %>
+    </script>
+    <script type="text/javascript">
+        UserVoice = window.UserVoice || []; (function () { var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true; uv.src = '//widget.uservoice.com/YW8Ocar8BLGF57xNfjAvrA.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s) })();
+        UserVoice.push(['set', {
+            accent_color: '#448dd6',
+            trigger_color: 'white',
+            trigger_background_color: 'rgba(46, 49, 51, 0.6)'
+        }]);
+        UserVoice.push(['identify']);
+        UserVoice.push(['addTrigger', '#feedback', { mode: 'contact' }]);
     </script>
 </body>
 </html>
