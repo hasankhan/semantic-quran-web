@@ -44,7 +44,7 @@
             <div class="ui-btn-right">
                 <a data-iconpos="notext"
                    data-role="button"
-                   data-icon="comment" 
+                   data-icon="comment"
                    id="feedback"
                    href="javascript:void(0)">
                     Feedback
@@ -56,6 +56,7 @@
                     View source
                 </a>
             </div>
+        </div>
         <div data-role="panel" data-position="left" data-position-fixed="true" data-display="overlay" id="nav-panel">
             <ul data-role="listview" style="margin-top:-16px;" class="nav-search">
                 <li data-filtertext="wai-aria" id="loginRow" class="hidden">
@@ -140,7 +141,7 @@
             </div>
             <ul id="tags<%= row.surah %>_<%= row.verse %>">
                 <% row.tags.forEach(function(tag){
-                print(tagTemplate({
+                        print(tagTemplate({
                         tag: tag,
                         surah: row.surah,
                         verse: row.verse
