@@ -31,7 +31,10 @@ var AppView = Backbone.View.extend({
     el: $('body'),
 
     initialize: function (client, router) {
-        this.mainView = new MainView(client, router);                
+        this.mainView = new MainView(client, router);
+        router.on('route', function () {
+            ga('send', 'pageview', Backbone.history.getFragment());
+        });
     }
 });
 
@@ -192,8 +195,7 @@ var MainView = Backbone.View.extend({
             return;
         }
 
-        this.router.navigate(surah.toString(), { trigger: false });
-        this.doViewPassage(surah);
+        this.router.navigate(surah.toString(), { trigger: true });
     },
 
     doViewPassage: function(surah, ayahStart, ayahEnd) {
