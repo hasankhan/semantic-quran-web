@@ -1,3 +1,4 @@
 *.suo
 node_modules
 *.log
+*.err

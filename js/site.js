@@ -85,7 +85,7 @@ var MainView = Backbone.View.extend({
 
         this.bindShortcuts();
         this.loadSurahs();
-        
+
         var self = this;
         $(window).scroll(function () {
             if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
@@ -120,8 +120,8 @@ var MainView = Backbone.View.extend({
 
     scrollMore: function() {
         if (!this.enableAutoScroll ||
-                this.currentSurah == 0 ||
-                this.surahList.length == 0 ||
+                this.currentSurah === 0 ||
+                this.surahList.length === 0 ||
                 this.ayahEnd >= this.surahList[this.currentSurah - 1].verses) {
             return;
         }
@@ -191,7 +191,7 @@ var MainView = Backbone.View.extend({
     },
 
     changeSurah: function(surah) {
-        if (surah == 0 || this.currentSurah == surah) {
+        if (surah === 0 || this.currentSurah == surah) {
             return;
         }
 
@@ -231,7 +231,7 @@ var MainView = Backbone.View.extend({
         var self = this;
         this.lastAddedTags = tags;
 
-        if (tags != null && tags.length > 0) {
+        if (tags !== null && tags.length > 0) {
             var values = tags.split(/[,;]/);
             $.each(values, function (i, value) {
                 self.addTag(value, surah, verse).done(function (result) {
@@ -341,9 +341,9 @@ var MainView = Backbone.View.extend({
 
         this.client.removeTag(surahNum, verseNum, val)
                 .done(function () {
-                    console.log('Successfully Deleted')
+                    console.log('Successfully Deleted');
                 });
-    },    
+    },
 
     onSearchSubmit: function () {
         var val = this.searchBox.val();
@@ -453,7 +453,7 @@ var MainView = Backbone.View.extend({
     }
 });
 
-$(function () {    
+$(function () {
     appView = new AppView(client, new Workspace());
-    Backbone.history.start();    
+    Backbone.history.start();
 });
